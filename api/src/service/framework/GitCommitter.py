@@ -21,7 +21,8 @@ class GitCommitter:
 
     CLONE_ALL_IF_NEEDED = f'{GitCommand.KW_CLONE}-{KW_ALL}-{KW_IF_DASH_NEEDED}'
     CHECKOUT_B_ALL_IF_NEEDED = f'{GitCommand.KW_CHECKOUT}-b-{KW_ALL}-{KW_IF_DASH_NEEDED}'
-    PUSH_SET_UPSTREAM_ORIGIN_ALL_IF_NEEDED = f'{GitCommand.KW_PUSH}-set-upstream-{GitCommand.KW_ORIGIN}-{KW_ALL}-{KW_IF_DASH_NEEDED}'
+    PUSH_SET_UPSTREAM_ORIGIN_ALL_IF_NEEDED = f'{GitCommand.KW_PUSH}-{GitCommand.KW_SET_UPSTREAM}-{GitCommand.KW_ORIGIN}-{KW_ALL}-{KW_IF_DASH_NEEDED}'
+    ADD_COMMIT_PUSH_SET_UPSTREAM_ORIGIN_ALL_IF_NEEDED = f'{GitCommand.KW_ADD}-{GitCommand.KW_COMMIT}-{GitCommand.KW_PUSH}-{GitCommand.KW_SET_UPSTREAM}-{GitCommand.KW_ORIGIN}-{KW_ALL}-{KW_IF_DASH_NEEDED}'
 
     STATUS_ALL = f'{GitCommand.KW_STATUS}-{KW_ALL}'
     BRANCH_ALL = f'{GitCommand.KW_BRANCH}-{KW_ALL}'
@@ -59,7 +60,7 @@ class GitCommitter:
 
     def __init__(self,globals):
         self.globals = globals
-        self.apiList = []
+        self.apiNameList = globals.apiNameList
         self.gitUrl = globals.getApiSetting(f'api.git.url')
         self.gitExtension = globals.getApiSetting(f'api.git.extension')
         self.commandSet = {
@@ -68,6 +69,7 @@ class GitCommitter:
             GitCommitter.CLONE_ALL_IF_NEEDED : self.cloneAllIfNeeded,
             GitCommitter.CHECKOUT_B_ALL_IF_NEEDED : self.checkoutBAllIfNeeded,
             GitCommitter.PUSH_SET_UPSTREAM_ORIGIN_ALL_IF_NEEDED : self.pushSetUpStreamOriginAllIfNedded,
+            GitCommitter.ADD_COMMIT_PUSH_SET_UPSTREAM_ORIGIN_ALL_IF_NEEDED : self.addCommitPushSetUpStreamOriginAllIfNedded,
 
             GitCommitter.STATUS_ALL : self.statusAll,
             GitCommitter.BRANCH_ALL : self.branchAll,
@@ -88,7 +90,7 @@ class GitCommitter:
     def runCommandList(self,commandList):
         globals = self.globals
         returnSet = {}
-        for projectName in globals.apiNameList :
+        for projectName in self.apiNameList :
             try :
                 returnSet[projectName] = {}
                 for command in commandList :
@@ -153,7 +155,7 @@ class GitCommitter:
         projectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
         if projectNameList :
             commandListTree = {}
-            for projectName in globals.apiNameList :
+            for projectName in self.apiNameList :
                 if projectName not in projectNameList :
                     projectUrl = f'{self.gitUrl}{projectName}.{self.gitExtension}'
                     command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,projectUrl)
@@ -201,6 +203,9 @@ class GitCommitter:
                                             commandPushSetUpStreamAll = GitCommand.PUSH_SET_UPSTREAM_ORIGIN_BRANCH.replace(GitCommand.TOKEN_BRANCH_NAME,branchName)
                                             returnCorrectionSet[projectName][commandPushSetUpStreamAll] = self.runCommandListTree({projectName:[commandPushSetUpStreamAll]})[projectName][commandPushSetUpStreamAll]
         self.debugReturnSet('pushSetUpStreamOriginAllIfNedded',self.getReturnSetValue(returnSet))
+
+    def addCommitPushSetUpStreamOriginAllIfNedded(self,commandList):
+        print('Good luck implementing it')
 
     def statusAll(self,commandList):
         returnSet = self.runCommandList([GitCommand.STATUS])
