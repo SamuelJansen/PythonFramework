@@ -43,22 +43,23 @@ class GitCommitter:
 
     CONFIRM = ['execute']
 
-    def handleCommandList(self,sysCommandList):
-        print(f'sysCommandList = {sysCommandList}')
+    def handleCommandList(self,commandList):
+        print(f'commandList = {commandList}')
         globals = self.globals
-        if len(sysCommandList) < GitCommitter.COMMAND_INDEX :
+        if len(commandList) < GitCommitter.COMMAND_INDEX :
             print(f'{globals.ERROR}{GitCommitter.MISSING_SPACE}{GitCommand.GIT_COMMITTER} command')
             return
-        gitCommiterCallCommand = sysCommandList[GitCommitter.GIT_COMMITTER_INDEX]
-        command = sysCommandList[GitCommitter.COMMAND_INDEX]
+        gitCommiterCallCommand = commandList[GitCommitter.GIT_COMMITTER_INDEX]
+        command = commandList[GitCommitter.COMMAND_INDEX]
         if GitCommand.GIT_COMMITTER == gitCommiterCallCommand :
             try :
-                return self.commandSet[command](sysCommandList)
+                return self.commandSet[command](commandList)
             except Exception as exception :
                 print(f'''{globals.ERROR}Error processing command "{gitCommiterCallCommand} {command}": {str(exception)}''')
 
     def __init__(self,globals):
         self.globals = globals
+        self.apiList = []
         self.gitUrl = globals.getApiSetting(f'api.git.url')
         self.gitExtension = globals.getApiSetting(f'api.git.extension')
         self.commandSet = {
@@ -118,9 +119,9 @@ class GitCommitter:
                 print(f'{self.globals.ERROR}{projectName}{globals.SPACE_DASH_SPACE}{command}{globals.NEW_LINE}{str(exception)}')
         return returnSet
 
-    def cloneProjectIfNeeded(self,sysCommandList):
+    def cloneProjectIfNeeded(self,commandList):
         globals = self.globals
-        projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',sysCommandList)
+        projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',commandList)
         projectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
         commandListTree = {}
         if not projectNameList or projectName not in projectNameList :
@@ -135,9 +136,9 @@ class GitCommitter:
             returnSet = self.runCommandListTree(commandListTree,path=processPath)
             self.debugReturnSet('cloneProjectIfNeeded',self.getReturnSetValue(returnSet))
 
-    def addCommitPushProject(self,sysCommandList):
-        projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',sysCommandList)
-        commitMessage = self.getArg(GitCommitter._2_ARGUMENT_INDEX,'CommitMessage name',sysCommandList)
+    def addCommitPushProject(self,commandList):
+        projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',commandList)
+        commitMessage = self.getArg(GitCommitter._2_ARGUMENT_INDEX,'CommitMessage name',commandList)
         if projectName :
             commandCommit = GitCommand.COMMIT.replace(GitCommand.TOKEN_COMMIT_MESSAGE,commitMessage)
             returnSet = self.runCommandListTree({projectName:[
@@ -147,7 +148,7 @@ class GitCommitter:
             ]})
             self.debugReturnSet('addCommitPushProject',self.getReturnSetValue(returnSet))
 
-    def cloneAllIfNeeded(self,sysCommandList):
+    def cloneAllIfNeeded(self,commandList):
         globals = self.globals
         projectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
         if projectNameList :
@@ -165,8 +166,8 @@ class GitCommitter:
                 returnSet = self.runCommandListTree(commandListTree,path=processPath)
                 self.debugReturnSet('cloneAllIfNeeded',self.getReturnSetValue(returnSet))
 
-    def checkoutBAllIfNeeded(self,sysCommandList):
-        branchName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Branch name',sysCommandList)
+    def checkoutBAllIfNeeded(self,commandList):
+        branchName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Branch name',commandList)
         if branchName :
             commandCheckoutAll = GitCommand.CHECKOUT.replace(GitCommand.TOKEN_BRANCH_NAME,branchName)
             returnSet = self.runCommandList([commandCheckoutAll])
@@ -180,7 +181,7 @@ class GitCommitter:
                                 returnCorrectionSet = self.runCommandListTree(commandListTree)
             self.debugReturnSet('checkoutBAllIfNeeded',self.getReturnSetValue(returnSet))
 
-    def pushSetUpStreamAllIfNedded(self,sysCommandList):
+    def pushSetUpStreamAllIfNedded(self,commandList):
         returnSet = self.runCommandList([GitCommand.PUSH])
         returnCorrectionSet = {}
         if returnSet and returnSet.items():
@@ -201,46 +202,46 @@ class GitCommitter:
                                             returnCorrectionSet[projectName][commandPushSetUpStreamAll] = self.runCommandListTree({projectName:[commandPushSetUpStreamAll]})[projectName][commandPushSetUpStreamAll]
         self.debugReturnSet('pushSetUpStreamAllIfNedded',self.getReturnSetValue(returnSet))
 
-    def statusAll(self,sysCommandList):
+    def statusAll(self,commandList):
         returnSet = self.runCommandList([GitCommand.STATUS])
         self.debugReturnSet('statusAll',self.getReturnSetValue(returnSet))
 
-    def branchAll(self,sysCommandList):
+    def branchAll(self,commandList):
         returnSet = self.runCommandList([GitCommand.BRANCH])
         self.debugReturnSet('branchAll',self.getReturnSetValue(returnSet))
 
-    def fetchAll(self,sysCommandList):
+    def fetchAll(self,commandList):
         returnSet = self.runCommandList([GitCommand.FETCH])
         self.debugReturnSet('fetchAll',self.getReturnSetValue(returnSet))
 
-    def pullAll(self,sysCommandList):
+    def pullAll(self,commandList):
         returnSet = self.runCommandList([GitCommand.PULL])
         self.debugReturnSet('pullAll',self.getReturnSetValue(returnSet))
 
-    def checkoutAll(self,sysCommandList):
-        branchName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Branch name',sysCommandList)
+    def checkoutAll(self,commandList):
+        branchName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Branch name',commandList)
         if branchName :
             commandCheckoutAll = GitCommand.CHECKOUT.replace(GitCommand.TOKEN_BRANCH_NAME,branchName)
             returnSet = self.runCommandList([commandCheckoutAll])
             self.debugReturnSet('checkoutAll',self.getReturnSetValue(returnSet))
 
-    def addAll(self,sysCommandList):
+    def addAll(self,commandList):
         returnSet = self.runCommandList([GitCommand.ADD])
         self.debugReturnSet('addAll',self.getReturnSetValue(returnSet))
 
-    def commitAll(self,sysCommandList):
-        commitMessage = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Commit message',sysCommandList)
+    def commitAll(self,commandList):
+        commitMessage = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Commit message',commandList)
         if commitMessage :
             commandCommit = GitCommand.COMMIT.replace(GitCommand.TOKEN_COMMIT_MESSAGE,commitMessage)
             returnSet = self.runCommandList([commandCommit])
             self.debugReturnSet('commitAll',self.getReturnSetValue(returnSet))
 
-    def pushAll(self,sysCommandList):
+    def pushAll(self,commandList):
         returnSet = self.runCommandList([GitCommand.PUSH])
         self.debugReturnSet('pushAll',self.getReturnSetValue(returnSet))
 
-    def addCommitPushAll(self,sysCommandList):
-        commitMessage = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Commit message',sysCommandList)
+    def addCommitPushAll(self,commandList):
+        commitMessage = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Commit message',commandList)
         if commitMessage :
             commandCommit = GitCommand.COMMIT.replace(GitCommand.TOKEN_COMMIT_MESSAGE,commitMessage)
             returnSet = self.runCommandList([
@@ -250,16 +251,16 @@ class GitCommitter:
             ])
             self.debugReturnSet('addCommitPushAll',self.getReturnSetValue(returnSet))
 
-    def mergeOriginAll(self,sysCommandList):
-        branchName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Branch name',sysCommandList)
+    def mergeOriginAll(self,commandList):
+        branchName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Branch name',commandList)
         if branchName :
             commandMergeOriginAll = GitCommand.MERGE_ORIGIN.replace(GitCommand.TOKEN_BRANCH_NAME,branchName)
             returnSet = self.runCommandList([commandMergeOriginAll])
             self.debugReturnSet('mergeOriginAll',self.getReturnSetValue(returnSet))
 
-    def addEnvironmentVariable(self,sysCommandList):
-        variableKey = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Environment variable key',sysCommandList)
-        variableValue = self.getArg(GitCommitter._2_ARGUMENT_INDEX,'Environment variable value',sysCommandList)
+    def addEnvironmentVariable(self,commandList):
+        variableKey = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Environment variable key',commandList)
+        variableValue = self.getArg(GitCommitter._2_ARGUMENT_INDEX,'Environment variable value',commandList)
         if variableKey and variableValue :
             globals = self.globals
             if variableKey == GitCommand.KW_SELF :
@@ -267,7 +268,7 @@ class GitCommitter:
                 print(variableValue)
             os.environ[variableKey] = variableValue
 
-    def wakeUpVoiceAssistant(self,sysCommandList):
+    def wakeUpVoiceAssistant(self,commandList):
         self.voiceAssistant = VoiceAssistant.VoiceAssistant(self.globals)
         WakeUpVoiceAssistant.run(self)
 
@@ -298,13 +299,13 @@ class GitCommitter:
     def debugReturnSet(self,callMethodName,ReturnSetValue):
         self.globals.debug(f'{callMethodName}{2 * self.globals.NEW_LINE}{ReturnSetValue}')
 
-    def getArg(self,argIndex,typingGetMessage,sysCommandList) :
+    def getArg(self,argIndex,typingGetMessage,commandList) :
         try :
-            if '()' in sysCommandList[argIndex] :
+            if '()' in commandList[argIndex] :
                 return self.validInput(self.getImput(typingGetMessage))
-            return sysCommandList[argIndex]
+            return commandList[argIndex]
         except Exception as exception :
-            self.globals.debug(f'Not possible to get sysCommandList[{argIndex}]. Cause: {str(exception)}')
+            self.globals.debug(f'Not possible to get commandList[{argIndex}]. Cause: {str(exception)}')
             return self.validInput(self.getImput(typingGetMessage))
 
     def validInput(self,input):
