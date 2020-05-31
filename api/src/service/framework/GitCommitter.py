@@ -21,7 +21,7 @@ class GitCommitter:
 
     CLONE_ALL_IF_NEEDED = f'{GitCommand.KW_CLONE}-{KW_ALL}-{KW_IF_DASH_NEEDED}'
     CHECKOUT_B_ALL_IF_NEEDED = f'{GitCommand.KW_CHECKOUT}-b-{KW_ALL}-{KW_IF_DASH_NEEDED}'
-    PUSH_SET_UPSTREAM_ORIGIN_BRANCH_IF_NEEDED = f'{GitCommand.KW_PUSH}-set-upstream-{GitCommand.KW_ORIGIN}-{KW_ALL}-{KW_IF_DASH_NEEDED}'
+    PUSH_SET_UPSTREAM_ORIGIN_ALL_IF_NEEDED = f'{GitCommand.KW_PUSH}-set-upstream-{GitCommand.KW_ORIGIN}-{KW_ALL}-{KW_IF_DASH_NEEDED}'
 
     STATUS_ALL = f'{GitCommand.KW_STATUS}-{KW_ALL}'
     BRANCH_ALL = f'{GitCommand.KW_BRANCH}-{KW_ALL}'
@@ -67,7 +67,7 @@ class GitCommitter:
 
             GitCommitter.CLONE_ALL_IF_NEEDED : self.cloneAllIfNeeded,
             GitCommitter.CHECKOUT_B_ALL_IF_NEEDED : self.checkoutBAllIfNeeded,
-            GitCommitter.PUSH_SET_UPSTREAM_ORIGIN_BRANCH_IF_NEEDED : self.pushSetUpStreamAllIfNedded,
+            GitCommitter.PUSH_SET_UPSTREAM_ORIGIN_ALL_IF_NEEDED : self.pushSetUpStreamOriginAllIfNedded,
 
             GitCommitter.STATUS_ALL : self.statusAll,
             GitCommitter.BRANCH_ALL : self.branchAll,
@@ -181,7 +181,7 @@ class GitCommitter:
                                 returnCorrectionSet = self.runCommandListTree(commandListTree)
             self.debugReturnSet('checkoutBAllIfNeeded',self.getReturnSetValue(returnSet))
 
-    def pushSetUpStreamAllIfNedded(self,commandList):
+    def pushSetUpStreamOriginAllIfNedded(self,commandList):
         returnSet = self.runCommandList([GitCommand.PUSH])
         returnCorrectionSet = {}
         if returnSet and returnSet.items():
@@ -200,7 +200,7 @@ class GitCommitter:
                                             branchName = dirtyBranchName.split()[1].strip()
                                             commandPushSetUpStreamAll = GitCommand.PUSH_SET_UPSTREAM_ORIGIN_BRANCH.replace(GitCommand.TOKEN_BRANCH_NAME,branchName)
                                             returnCorrectionSet[projectName][commandPushSetUpStreamAll] = self.runCommandListTree({projectName:[commandPushSetUpStreamAll]})[projectName][commandPushSetUpStreamAll]
-        self.debugReturnSet('pushSetUpStreamAllIfNedded',self.getReturnSetValue(returnSet))
+        self.debugReturnSet('pushSetUpStreamOriginAllIfNedded',self.getReturnSetValue(returnSet))
 
     def statusAll(self,commandList):
         returnSet = self.runCommandList([GitCommand.STATUS])
