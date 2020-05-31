@@ -1,0 +1,23 @@
+Globals:
+    print-status: True
+    api:
+        name: python-framework
+        list: [PythonFramework]
+        extension: yml
+        dependency:
+            update: False
+            list:
+                web: [Popen,Path,pygame,numpy,pywin32,SpeechRecognition,PyTTSx,chromedriver,selenium,sqlalchemy,pyautogui,wit] ###- pyaudio,python-Levenshtein
+                local: [PyAudio-0.2.11-cp38-cp38-win32.whl,python_Levenshtein-0.12.0-cp38-cp38-win32.whl]
+        language: EN-US ###- PT-BR ###-
+        git:
+            url: https://github.com/SamuelJansen/
+            extension: git
+    python:
+        version: '3.8'
+        version-command: python --version
+        py-audio:
+            install-example:
+                64: pip install PyAudio-0.2.11-cp38-cp38-win_amd64.whl ###- example
+                32: PyAudio-0.2.11-cp38-cp38-win32.whl ###- example
+        link: https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio ###- library
