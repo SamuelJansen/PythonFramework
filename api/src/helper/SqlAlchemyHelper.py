@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, UnicodeText, MetaData, Sequence, DateTime
@@ -11,6 +11,8 @@ Table = Table
 Column = Column
 Integer = Integer
 String = String
+
+exists = exists
 
 relationship = relationship
 
@@ -44,16 +46,25 @@ class SqlAlchemyHelper:
     def save(self,instance):
         self.session.add(instance)
         self.session.commit()
+        return instance
 
     def saveAll(self,instanceList):
         self.session.add_all(instanceList)
         self.session.commit()
+        return instanceList
 
     def findAll(self,model):
         return self.session.query(model).all()
 
-    def findById(self,model,id):
+    def findById(self,id,model):
         return self.session.query(model).filter(model.id == id).first()
 
-    def findByKey(self,model,key):
+    def findByKey(self,key,model):
         return self.session.query(model).filter(model.key == key).first()
+
+    def existsById(self,id,model):
+        # ret = Session.query(exists().where(and_(Someobject.field1 == value1, Someobject.field2 == value2)))
+        return self.session.query(exists().where(model.id == id)).one()[0]
+
+    def existsByKey(self,key,model):
+        return self.session.query(exists().where(model.key == key)).one()[0]

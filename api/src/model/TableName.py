@@ -1,0 +1,5 @@
+CLASS_API = 'Api'
+CLASS_SESSION = 'Session'
+
+API = CLASS_API.lower()
+SESSION = CLASS_SESSION.lower()

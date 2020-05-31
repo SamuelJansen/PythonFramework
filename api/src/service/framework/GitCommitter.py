@@ -44,7 +44,7 @@ class GitCommitter:
     CONFIRM = ['execute']
 
     def handleCommandList(self,commandList):
-        print(f'commandList = {commandList}')
+        print(f'GitCommitter.commandList = {commandList}')
         globals = self.globals
         if len(commandList) < GitCommitter.COMMAND_INDEX :
             print(f'{globals.ERROR}{GitCommitter.MISSING_SPACE}{GitCommand.GIT_COMMITTER} command')

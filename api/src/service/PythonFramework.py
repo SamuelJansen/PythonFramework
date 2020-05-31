@@ -1,6 +1,8 @@
-import SqlAlchemyHelper, GitCommitter, Api
+import SqlAlchemyHelper, GitCommitter
+import Api, Session
 
 Api = Api.Api
+Session = Session.Session
 GitCommitter = GitCommitter.GitCommitter
 SqlAlchemyHelper = SqlAlchemyHelper.SqlAlchemyHelper
 
@@ -30,7 +32,8 @@ class PythonFramework:
     KW_GIT_COMMITTER = API_KEY_GIT_COMMITTER
 
     def handleCommandList(self,commandList):
-        print(f'commandList = {commandList}')
+        print(f'PythonFramework.commandList = {commandList}')
+        print(f'apiSet = {self.apiSet}')
         return self.apiSet[commandList[self._0_API_KEY]][commandList[self._1_COMMAND]](commandList)
 
     def handleSystemArgumentValue(self,commandList,externalFunction):
@@ -72,9 +75,11 @@ class PythonFramework:
         externalFunction = args[-2]
         self.args = args[:-2]
         self.kwargs = kwargs
-        self.repositoryName = f'{self.__class__.__name__}'
+        self.name = self.globals.getApiSetting('api.name')
+        self.repositoryName = self.name
         self.repository = SqlAlchemyHelper(self.repositoryName)
         self.repository.run()
+        self.session = None
         self.gitCommitter = GitCommitter(self.globals)
         self.importApplicationScriptPath = f'{self.globals.apiPath}{self.globals.baseApiPath}runtime{self.globals.BACK_SLASH}{IMPORT_SCRITP_FILE_NAME}.{self.globals.PYTHON_EXTENSION}'
 
@@ -85,6 +90,21 @@ class PythonFramework:
         self.apiSet[self.API_KEY_GIT_COMMITTER] = self.gitCommitter.commandSet
 
         self.apiClassSet = self.getApiClassSet()
+
+    def addToSession(self,commandList):
+        pass
+
+    def removeFromSession(self,commansList):
+        pass
+
+    def saveSession(self,commandList):
+        pass
+
+    def openSession(self,commandList):
+        pass
+
+    def loadSession(self,commandList):
+        pass
 
     def getApiClassSet(self):
         apiClassSet = {
@@ -99,13 +119,34 @@ class PythonFramework:
 
     def addApi(self,commandList):
         globals = self.globals
+        if not self.session :
+            sessionKey = globals.NOTHING
+            while sessionKey == globals.NOTHING :
+                sessionKey = input(f'{globals.TAB}Type session key: ')
+                if not sessionKey == globals.NOTHING :
+                    if self.repository.existsByKey(sessionKey,Session) :
+                        globals.debug(f'{globals.TAB}{globals.WARNING}"{sessionKey}" session key already exists')
+                        self.session = self.repository.findByKey(sessionKey,Session)
+                    else :
+                        newSession = Session(sessionKey,[])
+                        self.session = self.repository.save(newSession)
+                    print(f'session = {self.session}')
         apiKey, apiClassName, gitUrl = self.createCredentials(commandList)
         if apiKey and apiClassName and gitUrl :
             try :
                 importApplicationScript = ADD_APPLICATION_FILE_SCRIPT.replace(APPLICATION_TOKEN,apiClassName)
-                newApplication = Api(apiKey,apiClassName,gitUrl,importApplicationScript)
-                self.repository.save(newApplication)
-                print(f'{globals.SUCCESS}{newApplication.key} key: {newApplication.className} added successfully')
+                if self.repository.existsByKey(apiKey,Api) :
+                    api = self.repository.findByKey(apiKey,Api)
+                    if api not in self.session.api_list :
+                        self.session.api_list.append(api)
+                        self.repository.saveAll(self.session.api_list)
+                        print(f'{globals.SUCCESS}"{api.key}" : "{api.class_name}" added successfully')
+                    globals.debug(f'{globals.TAB}{globals.WARNING}"{api.key}" : "{api.class_name}" already belongs to "{self.session.key}" session')
+                else :
+                    newApi = Api(apiKey,apiClassName,gitUrl,importApplicationScript,[self.session])
+                    print(f'newApi = {newApi}')
+                    newApi = self.repository.save(newApi)
+                    print(f'{globals.SUCCESS}"{newApi.key}" : "{newApi.class_name}" added successfully')
                 return
             except Exception as exception :
                 errorMessage = str(exception)
@@ -115,12 +156,12 @@ class PythonFramework:
 
     def loadApiClass(self,api):
         globals = self.globals
-        if api.className not in globals.apiNameList :
-            globals.makeApiAvaliable(api.className)
+        if api.class_name not in globals.apiNameList :
+            globals.makeApiAvaliable(api.class_name)
             globals.printTree(globals.apiTree,'globals.apiTree')
         try :
             with open(self.importApplicationScriptPath,globals.OVERRIDE,encoding = globals.ENCODING) as scriptFile :
-                scriptFile.write(''.join(api.importScript))
+                scriptFile.write(''.join(api.import_script))
             from ImportApplicationScript import getApiClass
             apiClass = getApiClass()
             self.eraseImportApplicationScript()
@@ -154,7 +195,7 @@ class PythonFramework:
     def getCredentials(self,commandList):
         apiKey = apiClassName = None
         try :
-            Api = self.repository.findByKey(apiKey)
+            Api = self.repository.findByKey(apiKey,Api)
             apiClassName = commandList[1]
             return apiKey, apiClassName
         except Exception as exception :

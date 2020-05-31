@@ -1,19 +1,23 @@
 from SqlAlchemyHelper import *
+from TableName import *
+from Session import *
 
 class Api(Model):
-    __tablename__ = 'api'
+    __tablename__ = API
 
     id = Column(Integer(), Sequence(f'{__tablename__}_id_seq'), primary_key=True)
     key = Column(String(128),unique=True)
-    className = Column(String(128),unique=True)
-    gitUrl = Column(String(256),unique=True)
-    importScript = Column(String(1024),unique=True)
+    class_name = Column(String(128),unique=True)
+    git_url = Column(String(256),unique=True)
+    import_script = Column(String(1024),unique=True)
+    session_list = relationship(CLASS_SESSION, secondary=apiToSessionAssociation, back_populates=f'{__tablename__}_list')
 
-    def __init__(self,key,className,gitUrl,importScript):
+    def __init__(self,key,class_name,git_url,import_script,session_list):
         self.key = key
-        self.className = className
-        self.gitUrl = gitUrl
-        self.importScript = importScript
+        self.class_name = class_name
+        self.git_url = git_url
+        self.import_script = import_script
+        self.session_list = session_list
 
     def __repr__(self):
-        return f'id = {self.id}\nkey = {self.key}\nclassName = {self.className}\ngitUrl = {self.gitUrl}\nimportScript = {self.importScript}'
+        return f'{self.__class__.__name__}(id={self.id}, key={self.key}, class_name={self.class_name}, git_url={self.git_url}, import_script={self.import_script})'

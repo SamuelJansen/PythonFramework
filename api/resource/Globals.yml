@@ -1,7 +1,7 @@
 Globals:
     print-status: True
     api:
-        name: python-framework
+        name: framework
         list: [PythonFramework]
         extension: yml
         dependency:
