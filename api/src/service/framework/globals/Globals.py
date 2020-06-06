@@ -502,8 +502,7 @@ class Globals:
                 fileNames.append(''.join(splitedName[:-1]))
         return fileNames
 
-    def printTree(self,tree,name,tab=0):
-        depth = tab * Globals.TAB_UNITS
+    def printTree(self,tree,name,depth=0):
         print(f'\n{name}')
         self.printNodeTree(tree,depth)
         print()

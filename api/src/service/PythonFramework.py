@@ -36,6 +36,7 @@ class PythonFramework:
     KW_LOAD_SESSION = 'load-session'
     KW_CURRENT_SESSION = 'current-session'
     KW_SESSION_COMMAND_LIST = 'session-command-list'
+
     KW_GIT_COMMITTER = API_KEY_GIT_COMMITTER
 
     def handleCommandList(self,commandList):
@@ -98,7 +99,8 @@ class PythonFramework:
             self.KW_SAVE_SESSION : self.saveSession,
             self.KW_OPEN_SESSION : self.openSession,
             self.KW_LOAD_SESSION : self.loadSession,
-            self.KW_CURRENT_SESSION : self.currentSession
+            self.KW_CURRENT_SESSION : self.currentSession,
+            self.KW_SESSION_COMMAND_LIST : self.sessionCommandList
         }
         self.apiSet[self.API_KEY_GIT_COMMITTER] = self.gitCommitter.commandSet
 
@@ -144,7 +146,7 @@ class PythonFramework:
             globals.error(PythonFramework, '''session hasn't being loaded so far''', '')
 
     def sessionCommandList(self,commandList):
-        self.globals.printTree(self.apiSet,f'{self.globals.TAB}Command list',tab=2)
+        self.globals.printTree(self.apiSet,f'{self.globals.TAB}Command list: ',depth=2)
 
     def getApiClassSet(self):
         apiClassSet = {
