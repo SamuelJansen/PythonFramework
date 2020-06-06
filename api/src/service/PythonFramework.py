@@ -28,12 +28,13 @@ class PythonFramework:
     _1_ARGUMENT = 3
     _2_ARGUMENT = 4
 
-    KW_ADD_API = 'add-api'
+    KW_ADD_API = 'add-api-by-key-value-pair'
     KW_GIT_COMMITTER = API_KEY_GIT_COMMITTER
 
     def handleCommandList(self,commandList):
+        globals = self.globals
         print(f'PythonFramework.commandList = {commandList}')
-        print(f'apiSet = {self.apiSet}')
+        globals.printTree(self.apiSet,'apiSet')
         return self.apiSet[commandList[self._0_API_KEY]][commandList[self._1_COMMAND]](commandList)
 
     def handleSystemArgumentValue(self,commandList,externalFunction):
@@ -175,6 +176,7 @@ class PythonFramework:
             scriptFile.write(''.join(blankScript))
 
     def createCredentials(self,commandList):
+        print(f'commandList = {commandList}')
         apiKey = apiClassName = gitUrl = None
         try :
             _0_API_KEY = 0
