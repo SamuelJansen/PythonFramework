@@ -567,3 +567,12 @@ class Globals:
     def debug(self,string):
         if self.debugStatus :
             print(f'{Globals.DEBUG}{string}')
+
+    def error(self,classRequest,message,exception):
+        if exception == Globals.NOTHING :
+            print(f'{Globals.ERROR}{classRequest.__name__} {message}')
+        else :
+            print(f'{Globals.ERROR}{classRequest.__name__} {message}. Cause: {str(exception)}')
+
+    def success(self,classRequest,message):
+        print(f'{Globals.SUCCESS}{classRequest.__name__} {message}')

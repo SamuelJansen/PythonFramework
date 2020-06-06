@@ -1,9 +1,7 @@
 from SqlAlchemyHelper import *
 from TableName import *
 
-apiToSessionAssociation = Table(f'{API}_to_{SESSION}', Model.metadata,
-    Column(f'{API}_id', Integer, ForeignKey(f'{API}.id')),
-    Column(f'{SESSION}_id', Integer, ForeignKey(f'{SESSION}.id')))
+apiToSessionAssociation = getManyToMany(API, SESSION)
 
 class Session(Model):
     __tablename__ = SESSION
