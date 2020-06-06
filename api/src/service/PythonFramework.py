@@ -35,12 +35,12 @@ class PythonFramework:
     KW_OPEN_SESSION = 'open-session'
     KW_LOAD_SESSION = 'load-session'
     KW_CURRENT_SESSION = 'current-session'
+    KW_SESSION_COMMAND_LIST = 'session-command-list'
     KW_GIT_COMMITTER = API_KEY_GIT_COMMITTER
 
     def handleCommandList(self,commandList):
         globals = self.globals
         print(f'PythonFramework.commandList = {commandList}')
-        globals.printTree(self.apiSet,'apiSet')
         return self.apiSet[commandList[self._0_API_KEY]][commandList[self._1_COMMAND]](commandList)
 
     def handleSystemArgumentValue(self,commandList,externalFunction):
@@ -142,6 +142,9 @@ class PythonFramework:
                 print(f'{globals.TAB * 2}{api.name}')
         else :
             globals.error(PythonFramework, '''session hasn't being loaded so far''', '')
+
+    def sessionCommandList(self,commandList):
+        self.globals.printTree(self.apiSet,f'{self.globals.TAB}Command list',tab=2)
 
     def getApiClassSet(self):
         apiClassSet = {
