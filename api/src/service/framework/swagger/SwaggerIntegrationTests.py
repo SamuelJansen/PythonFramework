@@ -20,8 +20,8 @@ SUCCESS_MESSAGE = 'Success'
 
 class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
 
-    def __init__(self,globals,**kargs):
-        SeleniumHelper.SeleniumHelper.__init__(self,globals,**kargs)
+    def __init__(self,globals,**kwargs):
+        SeleniumHelper.SeleniumHelper.__init__(self,globals,**kwargs)
         self.integrationPath = f'{globals.apiPath}{globals.baseApiPath}{INTEGRATION_FOLDER}{globals.BACK_SLASH}'
         self.mainSwaggerUrlFilePath = f'{self.integrationPath}{KW_INTEGRATION}.{self.globals.extension}'
         self.mainUrl = self.getFilteredSetting(KW_MAIN_SWAGGER_URL,globals.getSettingTree(settingFilePath=self.mainSwaggerUrlFilePath))
@@ -32,8 +32,8 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
     def runTest(self,url,tag,method,verb,processingTime,payload,expectedResponse) :
         self.resetValues(url,tag,method,verb,processingTime,payload,expectedResponse)
         swaggerUrl = self.accessSwaggerUrl()
-        swaggerTag = self.accessTag(swaggerUrl)
-        swaggerMethod = self.accessMethod(swaggerTag)
+        swaggerTag = self.accessSwaggerTag(swaggerUrl)
+        swaggerMethod = self.accessSwaggerMethod(swaggerTag)
         self.hitTryOut(swaggerMethod)
         self.typePayload(swaggerMethod)
         self.hitExecute(swaggerMethod)
@@ -56,10 +56,10 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
     def accessSwaggerUrl(self):
         return self.accessUrl(self.url)
 
-    def accessTag(self,swaggerUrl):
+    def accessSwaggerTag(self,swaggerUrl):
         return self.accessClass(SwaggerKeyWord.EXPAND_OPERATION,self.findById(self.findByIdRequest,swaggerUrl))
 
-    def accessMethod(self,swaggerTag):
+    def accessSwaggerMethod(self,swaggerTag):
         return self.accessId(self.accessIdRequest,swaggerTag)
 
     def hitTryOut(self,swaggerMethod):

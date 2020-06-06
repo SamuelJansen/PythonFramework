@@ -39,7 +39,7 @@ class WebScrapHelper(SeleniumHelper.SeleniumHelper):
             else :
                 print(f'Missing command: {list(self.commandSet.keys())}')
         else :
-            print(f'Missing api key:"{globals.CIFRAS_CLUB_WEB_SCRAPER}"')
+            print(f'Missing api key in command line')
 
     def __init__(self,globals,**kwargs):
         SeleniumHelper.SeleniumHelper.__init__(self,globals,**kwargs)
@@ -48,6 +48,7 @@ class WebScrapHelper(SeleniumHelper.SeleniumHelper):
         self.repositoryName = f'{self.name}-{DATABASE_LAST_NAME}'
         self.repository = SqlAlchemyHelper.SqlAlchemyHelper(self.repositoryName)
         self.repository.run()
+        self.commandSet = {}
 
     def run(self,commandList):
         self.globals.debug(f'[{self.globals.apiName}] run() method not implemented')

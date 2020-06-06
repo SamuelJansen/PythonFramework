@@ -7,7 +7,7 @@ Globals:
         dependency:
             update: False
             list:
-                web: [Popen,Path,pygame,numpy,pywin32,SpeechRecognition,PyTTSx,chromedriver,selenium,sqlalchemy,pyautogui,wit] ###- pyaudio,python-Levenshtein
+                web: [Popen,Path,pygame,numpy,pywin32,SpeechRecognition,PyTTSx,webdriver_manager,selenium,sqlalchemy,pyautogui,wit] ###- pyaudio,python-Levenshtein
                 local: [PyAudio-0.2.11-cp38-cp38-win32.whl,python_Levenshtein-0.12.0-cp38-cp38-win32.whl]
         language: EN-US ###- PT-BR ###-
         git:
