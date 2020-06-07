@@ -6,6 +6,8 @@ GitCommand = GitCommand.GitCommand
 
 class GitCommitter:
 
+    REQUIRES_GLOBALS = True
+
     GIT_COMMITTER_INDEX = 0
     COMMAND_INDEX = 1
     _1_ARGUMENT_INDEX = 2

@@ -43,6 +43,10 @@ class SqlAlchemyHelper:
     def run(self):
         Model.metadata.create_all(self.engine)
 
+    def saveNew(self,*args):
+        model = args[-1]
+        return self.save(model(*args[:-1]))
+
     def save(self,instance):
         self.session.add(instance)
         self.session.commit()
@@ -59,12 +63,15 @@ class SqlAlchemyHelper:
     def findById(self,id,model):
         return self.session.query(model).filter(model.id == id).first()
 
-    def findByKey(self,key,model):
-        return self.session.query(model).filter(model.key == key).first()
-
     def existsById(self,id,model):
         # ret = Session.query(exists().where(and_(Someobject.field1 == value1, Someobject.field2 == value2)))
         return self.session.query(exists().where(model.id == id)).one()[0]
 
+    def findByKey(self,key,model):
+        return self.session.query(model).filter(model.key == key).first()
+
     def existsByKey(self,key,model):
         return self.session.query(exists().where(model.key == key)).one()[0]
+
+    def findByStatus(self,status,model):
+        return self.session.query(model).filter(model.status == status).first()

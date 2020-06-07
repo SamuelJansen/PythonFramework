@@ -118,10 +118,16 @@ class Globals:
     ERROR =     '[ERROR  ] '
     WARNING =   '[WARNING] '
     SUCCESS =   '[SUCCESS] '
+    FAILURE =   '[FAILURE] '
+    SETTING =   '[SETTING] '
 
     def __init__(self,
         encoding = ENCODING,
-        debugStatus = False
+        debugStatus = False,
+        errorStatus = False,
+        successStatus = False,
+        failureStatus = False,
+        settingStatus = False,
     ):
 
         from pathlib import Path
@@ -130,7 +136,11 @@ class Globals:
 
         self.globalsName = self.__class__.__name__
         self.debugStatus = debugStatus
-        self.debug('Debug mode on')
+        self.errorStatus = errorStatus
+        self.successStatus = successStatus
+        self.failureStatus = failureStatus
+        self.settingStatus = settingStatus
+        self.setting(self.__class__,f'debugStatus={self.debugStatus}, errorStatus={self.errorStatus}, successStatus={self.successStatus}, failureStatus={self.failureStatus}, settingStatus={self.settingStatus}')
 
         self.charactereFilterList = Globals.CHARACTERE_FILTER
         self.nodeIgnoreList = Globals.NODE_IGNORE_LIST
@@ -463,14 +473,14 @@ class Globals:
         roughtValues = value[1:-1].split(Globals.COMA)
         values = []
         for value in roughtValues :
-            values.append(self.getValue(value))
+            values.append(self.getValue(value.strip()))
         return values
 
     def getTuple(self,value):
         roughtValues = value[1:-1].split(Globals.COMA)
         values = []
         for value in roughtValues :
-            values.append(self.getValue(value))
+            values.append(self.getValue(value.strip()))
         return tuple(values)
 
     def getDictionary(self,value) :
@@ -568,10 +578,41 @@ class Globals:
             print(f'{Globals.DEBUG}{string}')
 
     def error(self,classRequest,message,exception):
-        if exception == Globals.NOTHING :
-            print(f'{Globals.ERROR}{classRequest.__name__} {message}')
-        else :
-            print(f'{Globals.ERROR}{classRequest.__name__} {message}. Cause: {str(exception)}')
+        if self.errorStatus :
+            if classRequest == Globals.NOTHING :
+                classPortion = Globals.NOTHING
+            else :
+                classPortion = f'{classRequest.__name__} '
+            if exception == Globals.NOTHING :
+                errorPortion = Globals.NOTHING
+            else :
+                errorPortion = f'. Cause: {str(exception)}'
+            print(f'{Globals.ERROR}{classPortion}{message}{errorPortion}')
 
     def success(self,classRequest,message):
-        print(f'{Globals.SUCCESS}{classRequest.__name__} {message}')
+        if self.successStatus :
+            if classRequest == Globals.NOTHING :
+                classPortion = Globals.NOTHING
+            else :
+                classPortion = f'{classRequest.__name__} '
+            print(f'{Globals.SUCCESS}{classPortion}{message}')
+
+    def failure(self,classRequest,message,exception):
+        if self.failureStatus :
+            if classRequest == Globals.NOTHING :
+                classPortion = Globals.NOTHING
+            else :
+                classPortion = f'{classRequest.__name__} '
+            if exception == Globals.NOTHING :
+                errorPortion = Globals.NOTHING
+            else :
+                errorPortion = f'. Cause: {str(exception)}'
+            print(f'{Globals.FAILURE}{classPortion}{message}{errorPortion}')
+
+    def setting(self,classRequest,message):
+        if self.settingStatus :
+            if classRequest == Globals.NOTHING :
+                classPortion = Globals.NOTHING
+            else :
+                classPortion = f'{classRequest.__name__} '
+            print(f'{Globals.SETTING}{classPortion}{message}')
