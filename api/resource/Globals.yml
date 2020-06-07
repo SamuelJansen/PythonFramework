@@ -2,7 +2,7 @@ Globals:
     print-status: False
     api:
         name: framework
-        list: [PythonFramework]
+        list: [PythonFramework,OfficeTrackIntegrationTests]
         extension: yml
         dependency:
             update: False
