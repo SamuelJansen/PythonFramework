@@ -1,7 +1,7 @@
 import SqlAlchemyHelper, GitCommitter
 import Api, Session
 import FrameworkConstant
-from LoadSessionAnnotation import LoadSession, SessionMethod
+from SessionAnnotation import LoadSession, SessionMethod
 import FrameworkNewSession, FrameworkOpenSession, FrameworkPrintSession, FrameworkLoadApiClassSet
 import FrameworkSessionHelper
 
@@ -47,6 +47,7 @@ class PythonFramework:
 
     KW_GIT_COMMITTER = API_KEY_GIT_COMMITTER
 
+    @SessionMethod
     def handleCommandList(self,commandList):
         globals = self.globals
         globals.debug(f'{self.__class__.__name__}.commandList = {commandList}')
@@ -75,16 +76,24 @@ class PythonFramework:
         except Exception as exception :
             errorMessage = str(exception)
             if self.MISSING_REQUIRED_ARGUMENT in errorMessage :
-                newArgs = *self.args,globals
+                newArgs = *self.args,self.globals
                 try :
                     api = apiClass(*newArgs,**self.kwargs)
                     globals.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
                     return api.handleCommandList(commandList)
                 except Exception as exception :
-                    secondErrorMessage = f' after first try: {str(exception)}'
+                    secondErrorMessage = f', after first try: {str(exception)}'
+                    newArgs = *self.args,self.session,self.globals
+                    try :
+                        api = apiClass(*newArgs,**self.kwargs)
+                        globals.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
+                        return api.handleCommandList(commandList)
+                    except Exception as exception :
+                        thirdErrorMessage = f', after second try: {str(exception)}'
             else :
                 secondErrorMessage = ''
-            globals.error(PythonFramework, f'error processing "{commandList[self._0_API_KEY]}" call{secondErrorMessage}', errorMessage)
+                thirdErrorMessage = ''
+            globals.error(PythonFramework, f'error processing "{commandList[self._0_API_KEY]}" call{secondErrorMessage}{thirdErrorMessage}', errorMessage)
 
     def __init__(self,*args,**kwargs):
         self.globals = args[-1]
@@ -95,8 +104,8 @@ class PythonFramework:
         self.repositoryName = self.name
         self.repository = SqlAlchemyHelper(self.repositoryName)
         self.repository.run()
-        self.session = None
-        self.gitCommitter = GitCommitter(self.globals)
+
+        self.gitCommitter = self.getGitCommitter()
         self.importApplicationScriptPath = f'{self.globals.apiPath}{self.globals.baseApiPath}runtime{self.globals.BACK_SLASH}{IMPORT_SCRITP_FILE_NAME}.{self.globals.PYTHON_EXTENSION}'
 
         self.apiSet = {}
@@ -118,12 +127,15 @@ class PythonFramework:
             self.API_KEY_FRAMEWORK : PythonFramework,
             self.API_KEY_GIT_COMMITTER : GitCommitter
         }
+        self.loadApiClassSet()
 
+    @LoadSession
+    def getGitCommitter(self):
+        return GitCommitter(self.session,self.globals)
+
+    @SessionMethod
     def loadApiClassSet(self):
-        try :
-            FrameworkLoadApiClassSet.loadApiClassSet(self)
-        except Exception as exception :
-            self.globals.error(self.__class__,f'failed to load api class set',exception)
+        FrameworkLoadApiClassSet.loadApiClassSet(self)
 
     @SessionMethod
     def newSession(self,commandList):
@@ -134,14 +146,17 @@ class PythonFramework:
         self.globals.debug(f'{self.__class__.__name__}.addToSession({commandList})')
         pass
 
+    @SessionMethod
     def removeFromSession(self,commandList):
         self.globals.debug(f'{self.__class__.__name__}.removeFromSession({commandList})')
         pass
 
+    @SessionMethod
     def saveSession(self,commandList):
         self.globals.debug(f'{self.__class__.__name__}.saveSession({commandList})')
         pass
 
+    @SessionMethod
     def listAllSession(self,commandList):
         self.globals.debug(f'{self.__class__.__name__}.listAllSession({commandList})')
         pass
@@ -158,6 +173,7 @@ class PythonFramework:
     def sessionCommandList(self,commandList):
         self.globals.printTree(self.apiSet,f'{self.globals.TAB}Command list: ',depth=2)
 
+    @SessionMethod
     def addApiByKeyValue(self,commandList):
         self.globals.debug(f'{self.__class__.__name__}.addApiByKeyValue({commandList})')
         globals = self.globals
@@ -170,7 +186,7 @@ class PythonFramework:
                         globals.debug(f'{globals.TAB}{globals.WARNING}"{sessionKey}" session key already exists')
                         self.session = self.repository.findByKey(sessionKey,Session)
                     else :
-                        newSession = Session(sessionKey,[])
+                        newSession = Session(sessionKey,FrameworkStatus[FrameworkConstant.INACTIVE],[])
                         self.session = self.repository.save(newSession)
                     print(f'session = {self.session}')
         apiKey, apiClassName, gitUrl = self.createCredentials(commandList)

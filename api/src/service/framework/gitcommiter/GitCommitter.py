@@ -60,9 +60,10 @@ class GitCommitter:
             except Exception as exception :
                 print(f'''{globals.ERROR}Error processing command "{gitCommiterCallCommand} {command}": {str(exception)}''')
 
-    def __init__(self,globals):
+    def __init__(self,session,globals):
         self.globals = globals
-        self.apiNameList = globals.apiNameList
+        self.session = session
+        self.apiNameList = self.getApiNameList()
         self.gitUrl = globals.getApiSetting(f'api.git.url')
         self.gitExtension = globals.getApiSetting(f'api.git.extension')
         self.commandSet = {
@@ -323,3 +324,12 @@ class GitCommitter:
 
     def getImput(self,typingGetMessage):
         return input(f'{typingGetMessage}{self.globals.COLON_SPACE}')
+
+    def getApiNameList(self):
+        if self.session :
+            apiNameList = []
+            for api in self.session.api_list :
+                apiNameList.append(api.class_name)
+            return apiNameList
+        else :
+            return self.globals.apiNameList

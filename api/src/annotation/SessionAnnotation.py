@@ -8,13 +8,13 @@ WRAPPER = '[WRAPPER] '
 def LoadSession(function,*args,**kwargs) :
     def innerFunction(*args,**kwargs) :
         try :
-            PytonFramework = args[0]
-            PytonFramework.session = PytonFramework.repository.findByStatus(FrameworkStatus[FrameworkConstant.ACTIVE], Session)
-            if PytonFramework.session :
-                PytonFramework.globals.success(PytonFramework.__class__, f'"{PytonFramework.session.key}" session loaded successfully')
+            self = args[0]
+            self.session = self.repository.findByStatus(FrameworkStatus[FrameworkConstant.ACTIVE], Session)
+            if self.session :
+                self.globals.success(self.__class__, f'"{self.session.key}" session loaded successfully')
             else :
-                PytonFramework.globals.failure(PytonFramework.__class__,'session not found',PytonFramework.globals.NOTHING)
-            PytonFramework.loadApiClassSet()
+                self.globals.failure(self.__class__,'session not found',self.globals.NOTHING)
+            self.loadApiClassSet()
         except Exception as exception :
             print(f'''{WRAPPER}Failed to load framework session. Cause: {str(exception)}''')
         return function(*args,**kwargs)
@@ -23,7 +23,7 @@ def LoadSession(function,*args,**kwargs) :
 def SessionMethod(function,*args,**kwargs) :
     def innerFunction(*args,**kwargs) :
         try :
-            PytonFramework = args[0]
+            self = args[0]
             return function(*args,**kwargs)
         except Exception as exception :
             try :
