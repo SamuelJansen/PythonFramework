@@ -1,3 +1,10 @@
+import Api, Session
+Api = Api.Api
+Session = Session.Session
+
+import FrameworkConstant
+FrameworkStatus = FrameworkConstant.Status
+
 def loadApiClassSet(self) :
     self.globals.debug(f'Loading api class set of {self.__class__.__name__}')
     if self.session :

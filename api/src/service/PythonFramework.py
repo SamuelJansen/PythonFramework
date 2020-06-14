@@ -42,6 +42,7 @@ class PythonFramework:
     KW_SAVE_SESSION = 'save-session'
     KW_PRINT_SESSION = 'print-session'
     KW_SESSION_COMMAND_LIST = 'session-command-list'
+    KW_CLOSE_SESSION = 'close-session'
 
     KW_LIST_ALL_SESSION = 'list-all-session'
 
@@ -174,6 +175,11 @@ class PythonFramework:
         self.globals.printTree(self.apiSet,f'{self.globals.TAB}Command list: ',depth=2)
 
     @SessionMethod
+    def closeSession(self,commandList):
+        return FrameworkCloseSession.closeSession(self,commandList)
+
+
+    @SessionMethod
     def addApiByKeyValue(self,commandList):
         self.globals.debug(f'{self.__class__.__name__}.addApiByKeyValue({commandList})')
         globals = self.globals
@@ -223,15 +229,6 @@ class PythonFramework:
             else :
                 gitUrl = f'''{self.gitCommitter.gitUrl}/{apiClassName}.{self.gitCommitter.gitExtension}'''
             return apiKey, apiClassName, gitUrl
-        except Exception as exception :
-            print(f'''{self.globals.ERROR}{PythonFramework.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
-
-    def getCredentials(self,commandList):
-        apiKey = apiClassName = None
-        try :
-            Api = self.repository.findByKey(apiKey,Api)
-            apiClassName = commandList[1]
-            return apiKey, apiClassName
         except Exception as exception :
             print(f'''{self.globals.ERROR}{PythonFramework.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
 
