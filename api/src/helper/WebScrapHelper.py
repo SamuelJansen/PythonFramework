@@ -46,8 +46,7 @@ class WebScrapHelper(SeleniumHelper.SeleniumHelper):
         self.name = self.globals.getApiSetting(f'{KW_API}.{KW_NAME}')
         self.mainUrl = self.globals.getApiSetting(f'{KW_API}.{KW_MAIN_URL}')
         self.repositoryName = f'{self.name}-{DATABASE_LAST_NAME}'
-        self.repository = SqlAlchemyHelper.SqlAlchemyHelper(self.repositoryName)
-        self.repository.run()
+        self.repository = SqlAlchemyHelper.SqlAlchemyHelper(self.repositoryName,model=kwargs.get('model'))
         self.commandSet = {}
 
     def run(self,commandList):
