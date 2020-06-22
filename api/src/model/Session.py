@@ -1,5 +1,5 @@
 from SqlAlchemyHelper import *
-from TableName import *
+from PythonFrameworkTable import *
 
 apiToSessionAssociation = getManyToMany(API, SESSION)
 

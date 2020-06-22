@@ -1,4 +1,4 @@
-from TableName import Model
+from PythonFrameworkTable import Model
 import SqlAlchemyHelper, GitCommitter
 import Api, Session
 import FrameworkConstant
