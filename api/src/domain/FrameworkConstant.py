@@ -1,0 +1,7 @@
+ACTIVE = 'ACTIVE'
+INACTIVE = 'INACTIVE'
+
+Status = {
+    ACTIVE : ACTIVE,
+    INACTIVE : INACTIVE
+}

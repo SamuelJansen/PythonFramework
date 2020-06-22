@@ -1,4 +1,5 @@
 from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 import pyautogui, pyperclip
@@ -25,8 +26,6 @@ class SeleniumHelper:
         self.time = time
         self.pyautogui.FAILSAFE = True
         self.pyperclip = pyperclip
-        self.driverPath = f'{globals.apiPath}{globals.API_BACK_SLASH}{globals.RESOURCE_BACK_SLASH}{globals.DEPENDENCY_BACK_SLASH}chromedriver.exe'
-        print(f'self.driverPath = {self.driverPath}')
         self.waittingTime = waittingTime
         self.fractionOfWaittingTime = waittingTime / 7.0
 
@@ -39,7 +38,7 @@ class SeleniumHelper:
         except Exception as exception :
             self.globals.debug(f'{self.globals.ERROR}Failed to close driver. Cause: {str(exception)}')
         try :
-            self.driver = webdriver.Chrome(executable_path=self.driverPath)
+            self.driver = webdriver.Chrome(ChromeDriverManager().install()) ### webdriver.Chrome(executable_path=self.driverPath)
             self.wait()
             return self.driver.find_element_by_tag_name(self.TAG_BODY)
         except Exception as exception :

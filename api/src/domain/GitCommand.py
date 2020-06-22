@@ -15,6 +15,7 @@ class GitCommand:
     KW_FETCH = 'fetch'
     KW_MERGE = 'merge'
     KW_ORIGIN = 'origin'
+    KW_SET_UPSTREAM = 'set-upstream'
 
     TOKEN_PROJECT_URL = '__TOKEN_PROJECT_URL__'
     TOKEN_COMMIT_MESSAGE = '__TOKEN_COMMIT_MESSAGE__'

@@ -65,13 +65,14 @@ class Globals:
     SRC_BACK_SLASH = f'src{BACK_SLASH}'
     BASE_API_PATH = f'{API_BACK_SLASH}{SRC_BACK_SLASH}'
 
+    GLOBALS_BACK_SLASH = f'globals{BACK_SLASH}'
     FRAMEWORK_BACK_SLASH = f'framework{BACK_SLASH}'
     SERVICE_BACK_SLASH = f'service{BACK_SLASH}'
     RESOURCE_BACK_SLASH = f'resource{BACK_SLASH}'
     REPOSITORY_BACK_SLASH = f'repository{BACK_SLASH}'
     DEPENDENCY_BACK_SLASH = f'dependency{BACK_SLASH}'
 
-    LOCAL_GLOBALS_API_PATH = f'{SERVICE_BACK_SLASH}{FRAMEWORK_BACK_SLASH}'
+    LOCAL_GLOBALS_API_PATH = f'{SERVICE_BACK_SLASH}{FRAMEWORK_BACK_SLASH}{GLOBALS_BACK_SLASH}'
 
     PIP_INSTALL = f'pip install'
     UPDATE_PIP_INSTALL = 'python -m pip install --upgrade pip'
@@ -117,10 +118,16 @@ class Globals:
     ERROR =     '[ERROR  ] '
     WARNING =   '[WARNING] '
     SUCCESS =   '[SUCCESS] '
+    FAILURE =   '[FAILURE] '
+    SETTING =   '[SETTING] '
 
     def __init__(self,
         encoding = ENCODING,
-        debugStatus = False
+        debugStatus = False,
+        errorStatus = False,
+        successStatus = False,
+        failureStatus = False,
+        settingStatus = False,
     ):
 
         from pathlib import Path
@@ -129,7 +136,11 @@ class Globals:
 
         self.globalsName = self.__class__.__name__
         self.debugStatus = debugStatus
-        self.debug('Debug mode on')
+        self.errorStatus = errorStatus
+        self.successStatus = successStatus
+        self.failureStatus = failureStatus
+        self.settingStatus = settingStatus
+        self.setting(self.__class__,f'debugStatus={self.debugStatus}, errorStatus={self.errorStatus}, successStatus={self.successStatus}, failureStatus={self.failureStatus}, settingStatus={self.settingStatus}')
 
         self.charactereFilterList = Globals.CHARACTERE_FILTER
         self.nodeIgnoreList = Globals.NODE_IGNORE_LIST
@@ -329,11 +340,11 @@ class Globals:
                             longStringList
                         )
                         depth = currentDepth
-        if self.apiName not in settingTree.keys() :
-            try :
-                self.concatenateTree(f'{self.apiPath}{Globals.API_BACK_SLASH}{Globals.RESOURCE_BACK_SLASH}{self.apiName}.{self.accessTree(AttributeKey.getKeyByClassNameAndKey(Globals,AttributeKey.API_EXTENSION),settingTree)}',settingTree)
-            except Exception as exception :
-                self.debug(f'Not possible to get api properties tree. Cause: {str(exception)}')
+        # if self.apiName not in settingTree.keys() :
+        #     try :
+        #         self.concatenateTree(f'{self.apiPath}{Globals.API_BACK_SLASH}{Globals.RESOURCE_BACK_SLASH}{self.apiName}.{self.accessTree(AttributeKey.getKeyByClassNameAndKey(Globals,AttributeKey.API_EXTENSION),settingTree)}',settingTree)
+        #     except Exception as exception :
+        #         self.debug(f'Not possible to get api properties tree. Cause: {str(exception)}')
         return settingTree
 
     def settingsTreeInnerLoop(self,settingLine,nodeKey,settingTree,longStringCapturing,quoteType,longStringList):
@@ -462,14 +473,14 @@ class Globals:
         roughtValues = value[1:-1].split(Globals.COMA)
         values = []
         for value in roughtValues :
-            values.append(self.getValue(value))
+            values.append(self.getValue(value.strip()))
         return values
 
     def getTuple(self,value):
         roughtValues = value[1:-1].split(Globals.COMA)
         values = []
         for value in roughtValues :
-            values.append(self.getValue(value))
+            values.append(self.getValue(value.strip()))
         return tuple(values)
 
     def getDictionary(self,value) :
@@ -501,8 +512,7 @@ class Globals:
                 fileNames.append(''.join(splitedName[:-1]))
         return fileNames
 
-    def printTree(self,tree,name):
-        depth = 0
+    def printTree(self,tree,name,depth=0):
         print(f'\n{name}')
         self.printNodeTree(tree,depth)
         print()
@@ -566,3 +576,43 @@ class Globals:
     def debug(self,string):
         if self.debugStatus :
             print(f'{Globals.DEBUG}{string}')
+
+    def error(self,classRequest,message,exception):
+        if self.errorStatus :
+            if classRequest == Globals.NOTHING :
+                classPortion = Globals.NOTHING
+            else :
+                classPortion = f'{classRequest.__name__} '
+            if exception == Globals.NOTHING :
+                errorPortion = Globals.NOTHING
+            else :
+                errorPortion = f'. Cause: {str(exception)}'
+            print(f'{Globals.ERROR}{classPortion}{message}{errorPortion}')
+
+    def success(self,classRequest,message):
+        if self.successStatus :
+            if classRequest == Globals.NOTHING :
+                classPortion = Globals.NOTHING
+            else :
+                classPortion = f'{classRequest.__name__} '
+            print(f'{Globals.SUCCESS}{classPortion}{message}')
+
+    def failure(self,classRequest,message,exception):
+        if self.failureStatus :
+            if classRequest == Globals.NOTHING :
+                classPortion = Globals.NOTHING
+            else :
+                classPortion = f'{classRequest.__name__} '
+            if exception == Globals.NOTHING :
+                errorPortion = Globals.NOTHING
+            else :
+                errorPortion = f'. Cause: {str(exception)}'
+            print(f'{Globals.FAILURE}{classPortion}{message}{errorPortion}')
+
+    def setting(self,classRequest,message):
+        if self.settingStatus :
+            if classRequest == Globals.NOTHING :
+                classPortion = Globals.NOTHING
+            else :
+                classPortion = f'{classRequest.__name__} '
+            print(f'{Globals.SETTING}{classPortion}{message}')
