@@ -5,6 +5,7 @@ CLASS_SESSION = 'Session'
 
 API = CLASS_API.lower()
 SESSION = CLASS_SESSION.lower()
+Model = getNewModel()
 
 def getManyToMany(son, father):
     return Table(f'{son}_to_{father}', Model.metadata,

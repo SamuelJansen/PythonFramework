@@ -13,7 +13,7 @@ def openSession(self,commandList) :
     if self.repository.existsByKey(sessionKey,Session) :
         FrameworkSessionHelper.deactivateSessionList(self,activeSessionList)
         FrameworkSessionHelper.activateSession(self,self.repository.findByKey(sessionKey,Session))
-        self.printSuccess(f'"{sessionKey}" session oppened')
+        self.printSuccess(f'"{sessionKey}" session oppened successfully')
     else :
         self.printError(f'"{sessionKey}" session not found')
         self.session = None

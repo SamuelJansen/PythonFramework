@@ -1,23 +1,18 @@
+from TableName import Model
 import SqlAlchemyHelper, GitCommitter
 import Api, Session
 import FrameworkConstant
-from SessionAnnotation import LoadSession, SessionMethod
-import FrameworkNewSession, FrameworkOpenSession, FrameworkPrintSession, FrameworkLoadApiClassSet
+from LoadSessionAnnotation import LoadSession
+from SessionMethodAnnotation import SessionMethod
+from PythonFrameworkApplicationScript import *
+import FrameworkNewSession, FrameworkOpenSession, FrameworkPrintSession, FrameworkLoadApiClassSet, FrameworkCloseSession, FrameworkAddToSession
 import FrameworkSessionHelper
 
 Api = Api.Api
 Session = Session.Session
 GitCommitter = GitCommitter.GitCommitter
-SqlAlchemyHelper = SqlAlchemyHelper.SqlAlchemyHelper
+# SqlAlchemyHelper = SqlAlchemyHelper.SqlAlchemyHelper
 FrameworkStatus = FrameworkConstant.Status
-
-IMPORT_SCRITP_FILE_NAME = 'ImportApplicationScript'
-APPLICATION_TOKEN = '__APPLICATION_TOKEN__'
-ADD_APPLICATION_FILE_SCRIPT = f'''
-import {APPLICATION_TOKEN}
-def getApiClass():
-    return {APPLICATION_TOKEN}.{APPLICATION_TOKEN}
-'''
 
 class PythonFramework:
 
@@ -32,19 +27,34 @@ class PythonFramework:
     _0_ARGUMENT = 2
     _1_ARGUMENT = 3
     _2_ARGUMENT = 4
+    _3_ARGUMENT = 5
 
-    KW_ADD_API_BY_KEY_VALUE = 'add-api-by-key-value'
+    COMMAND_ADD_API_BY_KEY_VALUE = 'add-api-by-key-value'
 
-    KW_NEW_SESSION = 'new-session'
-    KW_OPEN_SESSION = 'open-session'
-    KW_ADD_TO_SESSION = 'add-to-session'
-    KW_REMOVE_FROM_SESSION = 'remove-from-session'
-    KW_SAVE_SESSION = 'save-session'
-    KW_PRINT_SESSION = 'print-session'
-    KW_SESSION_COMMAND_LIST = 'session-command-list'
-    KW_CLOSE_SESSION = 'close-session'
+    COMMAND_NEW_SESSION = 'new-session'
+    COMMAND_OPEN_SESSION = 'open-session'
+    COMMAND_ADD_TO_SESSION = 'add-to-session'
+    COMMAND_REMOVE_FROM_SESSION = 'remove-from-session'
+    COMMAND_SAVE_SESSION = 'save-session'
+    COMMAND_PRINT_SESSION = 'print-session'
+    COMMAND_SESSION_COMMAND_LIST = 'session-command-list'
+    COMMAND_CLOSE_SESSION = 'close-session'
 
-    KW_LIST_ALL_SESSION = 'list-all-session'
+    COMMAND_LIST_ALL_SESSION = 'list-all-session'
+
+    COMMAND_COMMAND_LIST = 'command-list'
+    commandList = {
+        COMMAND_ADD_API_BY_KEY_VALUE : [],
+        COMMAND_NEW_SESSION : [],
+        COMMAND_OPEN_SESSION : [],
+        COMMAND_ADD_TO_SESSION : ['sessionKey','apiKey','apiClassName','gitUrl'],
+        COMMAND_REMOVE_FROM_SESSION : [],
+        COMMAND_SAVE_SESSION : [],
+        COMMAND_PRINT_SESSION : [],
+        COMMAND_SESSION_COMMAND_LIST : [],
+        COMMAND_CLOSE_SESSION : [],
+        COMMAND_LIST_ALL_SESSION : []
+    }
 
     KW_GIT_COMMITTER = API_KEY_GIT_COMMITTER
 
@@ -103,31 +113,33 @@ class PythonFramework:
         self.kwargs = kwargs
         self.name = self.globals.getApiSetting('api.name')
         self.repositoryName = self.name
-        self.repository = SqlAlchemyHelper(self.repositoryName)
-        self.repository.run()
-
-        self.gitCommitter = self.getGitCommitter()
+        self.repository = SqlAlchemyHelper.SqlAlchemyHelper(self.repositoryName,model=Model)
+        # self.repository.run()
         self.importApplicationScriptPath = f'{self.globals.apiPath}{self.globals.baseApiPath}runtime{self.globals.BACK_SLASH}{IMPORT_SCRITP_FILE_NAME}.{self.globals.PYTHON_EXTENSION}'
 
         self.apiSet = {}
         self.apiSet[self.API_KEY_FRAMEWORK] = {
-            self.KW_ADD_API_BY_KEY_VALUE : self.addApiByKeyValue,
+            self.COMMAND_ADD_API_BY_KEY_VALUE : self.addApiByKeyValue,
 
-            self.KW_NEW_SESSION : self.newSession,
-            self.KW_ADD_TO_SESSION : self.addToSession,
-            self.KW_REMOVE_FROM_SESSION : self.removeFromSession,
-            self.KW_SAVE_SESSION : self.saveSession,
-            self.KW_OPEN_SESSION : self.openSession,
-            self.KW_PRINT_SESSION : self.printSession,
-            self.KW_SESSION_COMMAND_LIST : self.sessionCommandList,
+            self.COMMAND_NEW_SESSION : self.newSession,
+            self.COMMAND_ADD_TO_SESSION : self.addToSession,
+            self.COMMAND_REMOVE_FROM_SESSION : self.removeFromSession,
+            self.COMMAND_SAVE_SESSION : self.saveSession,
+            self.COMMAND_OPEN_SESSION : self.openSession,
+            self.COMMAND_PRINT_SESSION : self.printSession,
+            self.COMMAND_SESSION_COMMAND_LIST : self.sessionCommandList,
+            self.COMMAND_CLOSE_SESSION : self.closeSession,
 
-            self.KW_LIST_ALL_SESSION : self.listAllSession
+            self.COMMAND_LIST_ALL_SESSION : self.listAllSession,
+
+            self.COMMAND_COMMAND_LIST : self.printCommandList
         }
-        self.apiSet[self.API_KEY_GIT_COMMITTER] = self.gitCommitter.commandSet
         self.apiClassSet = {
             self.API_KEY_FRAMEWORK : PythonFramework,
             self.API_KEY_GIT_COMMITTER : GitCommitter
         }
+        self.gitCommitter = self.getGitCommitter()
+        self.apiSet[self.API_KEY_GIT_COMMITTER] = self.gitCommitter.commandSet
         self.loadApiClassSet()
 
     @LoadSession
@@ -144,8 +156,7 @@ class PythonFramework:
 
     @SessionMethod
     def addToSession(self,commandList):
-        self.globals.debug(f'{self.__class__.__name__}.addToSession({commandList})')
-        pass
+        return FrameworkAddToSession.addToSession(self,commandList)
 
     @SessionMethod
     def removeFromSession(self,commandList):
@@ -177,7 +188,6 @@ class PythonFramework:
     @SessionMethod
     def closeSession(self,commandList):
         return FrameworkCloseSession.closeSession(self,commandList)
-
 
     @SessionMethod
     def addApiByKeyValue(self,commandList):
@@ -231,6 +241,10 @@ class PythonFramework:
             return apiKey, apiClassName, gitUrl
         except Exception as exception :
             print(f'''{self.globals.ERROR}{PythonFramework.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
+
+    @SessionMethod
+    def printCommandList(self,commandList):
+        self.globals.printTree(self.commandList,f'{self.__class__.__name__} commandList',depth=1)
 
     def printSuccess(self,message):
         print(f'{self.globals.TAB}{self.globals.SUCCESS}{message}')

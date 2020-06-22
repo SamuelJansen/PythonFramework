@@ -1,6 +1,7 @@
 from SqlAlchemyHelper import *
 from TableName import *
 from Session import *
+import Constant
 
 class Api(Model):
     __tablename__ = API
@@ -19,5 +20,7 @@ class Api(Model):
         self.import_script = import_script
         self.session_list = session_list
 
+        self.strImportScript = f', import_script={Constant.SPACE.join(self.import_script.replace(Constant.NEW_LINE,Constant.NOTHING).split())}'
+
     def __repr__(self):
-        return f'{self.__class__.__name__}(id={self.id}, key={self.key}, class_name={self.class_name}, git_url={self.git_url}, import_script={self.import_script})'
+        return f'{self.__class__.__name__}(id={self.id}, key={self.key}, class_name={self.class_name}, git_url={self.git_url})'

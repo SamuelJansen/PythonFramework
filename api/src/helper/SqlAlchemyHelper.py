@@ -20,9 +20,12 @@ Sequence = Sequence
 ForeignKey = ForeignKey
 MetaData = MetaData
 
-Model = declarative_base()
+# Model = declarative_base()
 
 DATABASE_LAST_NAME = '-database'
+
+def getNewModel() :
+    return declarative_base()
 
 class SqlAlchemyHelper:
 
@@ -30,18 +33,19 @@ class SqlAlchemyHelper:
     TRIPLE_BAR = '///'
     EXTENSION = 'db'
 
-    def __init__(self,firstName,type=DEFAULT_DATABASE_TYPE,extension=EXTENSION,echo=False):
+    def __init__(self,firstName,type=DEFAULT_DATABASE_TYPE,model=None,extension=EXTENSION,echo=False):
         self.sqlalchemy = sqlalchemy
         self.firstName = firstName
         self.type = type
         self.extension = extension
         self.engine = create_engine(f'{self.type}:{self.TRIPLE_BAR}{self.firstName}{DATABASE_LAST_NAME}.{self.extension}', echo=echo)
         self.session = scoped_session(sessionmaker(self.engine)) ###- sessionmaker(bind=self.engine)()
-        self.Model = Model
-        self.Model.metadata.bind = self.engine
+        self.model = model
+        self.model.metadata.bind = self.engine
+        self.run()
 
     def run(self):
-        Model.metadata.create_all(self.engine)
+        self.model.metadata.create_all(self.engine)
 
     def saveNew(self,*args):
         model = args[-1]

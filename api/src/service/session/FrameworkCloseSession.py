@@ -13,3 +13,4 @@ def closeSession(self,commandList):
     session = self.repository.findByKey(sessionKey,Session)
     session.status = FrameworkStatus[FrameworkConstant.INACTIVE]
     self.repository.save(session)
+    self.printSuccess(f'"{sessionKey}" session closed successfully')
