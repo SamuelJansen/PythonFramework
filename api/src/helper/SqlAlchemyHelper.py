@@ -22,23 +22,54 @@ MetaData = MetaData
 
 # Model = declarative_base()
 
-DATABASE_LAST_NAME = '-database'
-
 def getNewModel() :
     return declarative_base()
 
 class SqlAlchemyHelper:
 
     DEFAULT_DATABASE_TYPE = 'sqlite'
-    TRIPLE_BAR = '///'
+    BAR = '''/'''
+    COLON = ''':'''
+    ARROBA = '''@'''
+    DOUBLE_BAR = 2 * BAR
+    TRIPLE_BAR = 3 * BAR
+
+    NOTHING = ''
+
     EXTENSION = 'db'
 
-    def __init__(self,firstName,type=DEFAULT_DATABASE_TYPE,model=None,extension=EXTENSION,echo=False):
+    def __init__(self,name,
+            dialect = DEFAULT_DATABASE_TYPE,
+            user = None,
+            password = None,
+            host = None,
+            port = None,
+            model = None,
+            echo = False):
         self.sqlalchemy = sqlalchemy
-        self.firstName = firstName
-        self.type = type
-        self.extension = extension
-        self.engine = create_engine(f'{self.type}:{self.TRIPLE_BAR}{self.firstName}{DATABASE_LAST_NAME}.{self.extension}', echo=echo)
+        self.name = name
+        self.dialect = dialect
+        self.user = user
+        self.password = password
+        self.host = host
+        self.port = port
+        use_password_host = self.NOTHING
+        if self.user and self.password :
+            use_password_host += f'{self.user}{self.COLON}{self.password}'
+        if self.host :
+            use_password_host += f'{self.ARROBA}{self.host}{self.COLON}{self.port}'
+        use_password_host += self.BAR
+
+        if use_password_host == self.BAR :
+            self.name = f'{self.name}.{self.EXTENSION}'
+
+        if not self.dialect :
+            self.dialect = self.DEFAULT_DATABASE_TYPE
+
+        self.databaseUrl = f'{self.dialect}:{self.DOUBLE_BAR}{use_password_host}{self.name}'
+        print(f'self.databaseUrl = {self.databaseUrl}')
+
+        self.engine = create_engine(self.databaseUrl, echo=echo)
         self.session = scoped_session(sessionmaker(self.engine)) ###- sessionmaker(bind=self.engine)()
         self.model = model
         self.model.metadata.bind = self.engine
@@ -79,3 +110,8 @@ class SqlAlchemyHelper:
 
     def findByStatus(self,status,model):
         return self.session.query(model).filter(model.status == status).first()
+
+    def findAllByQuery(self,query,model):
+        if query :
+            return self.session.query(model).filter_by(**query).all()
+        return []

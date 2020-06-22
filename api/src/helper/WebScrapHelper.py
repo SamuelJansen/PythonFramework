@@ -6,9 +6,19 @@ KW_API = 'api'
 KW_NAME = 'name'
 KW_MAIN_URL = 'main-url'
 
+KW_REPOSITORY = 'repository'
+KW_REPOSITORY_DIALECT = 'dialect'
+KW_REPOSITORY_USER = 'user'
+KW_REPOSITORY_PASSWORD = 'password'
+KW_REPOSITORY_HOST = 'host'
+KW_REPOSITORY_PORT = 'port'
+KW_REPOSITORY_DATABASE = 'database'
+
 DATABASE_LAST_NAME = 'database'
 
 class WebScrapHelper(SeleniumHelper.SeleniumHelper):
+
+    FILE_FOLDER_LOCAL_PATH = FILE_FOLDER_LOCAL_PATH
 
     DATASET_FILE_NAME = 'dataset'
     SECOND_DATASET_FILE_NAME = 'second-dataset'
@@ -42,11 +52,32 @@ class WebScrapHelper(SeleniumHelper.SeleniumHelper):
             print(f'Missing api key in command line')
 
     def __init__(self,globals,**kwargs):
+        modelKey = 'model'
+        model = kwargs.get(modelKey)
+        del kwargs[modelKey]
         SeleniumHelper.SeleniumHelper.__init__(self,globals,**kwargs)
         self.name = self.globals.getApiSetting(f'{KW_API}.{KW_NAME}')
+
+        self.repositoryDialect = self.globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_DIALECT}')
+        self.repositoryUser = self.globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_USER}')
+        self.repositoryPassword = self.globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_PASSWORD}')
+        self.repositoryHost = self.globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_HOST}')
+        self.repositoryPort = self.globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_PORT}')
+        self.databaseName = self.globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_DATABASE}')
+
+        if not self.databaseName :
+            self.databaseName = self.name
+        self.repository = SqlAlchemyHelper.SqlAlchemyHelper(
+            self.databaseName,
+            dialect = self.repositoryDialect,
+            user = self.repositoryUser,
+            password = self.repositoryPassword,
+            host = self.repositoryHost,
+            port = self.repositoryPort,
+            model = model
+        )
+
         self.mainUrl = self.globals.getApiSetting(f'{KW_API}.{KW_MAIN_URL}')
-        self.repositoryName = f'{self.name}-{DATABASE_LAST_NAME}'
-        self.repository = SqlAlchemyHelper.SqlAlchemyHelper(self.repositoryName,model=kwargs.get('model'))
         self.commandSet = {}
 
     def run(self,commandList):

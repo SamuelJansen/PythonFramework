@@ -340,11 +340,6 @@ class Globals:
                             longStringList
                         )
                         depth = currentDepth
-        # if self.apiName not in settingTree.keys() :
-        #     try :
-        #         self.concatenateTree(f'{self.apiPath}{Globals.API_BACK_SLASH}{Globals.RESOURCE_BACK_SLASH}{self.apiName}.{self.accessTree(AttributeKey.getKeyByClassNameAndKey(Globals,AttributeKey.API_EXTENSION),settingTree)}',settingTree)
-        #     except Exception as exception :
-        #         self.debug(f'Not possible to get api properties tree. Cause: {str(exception)}')
         return settingTree
 
     def settingsTreeInnerLoop(self,settingLine,nodeKey,settingTree,longStringCapturing,quoteType,longStringList):
@@ -542,7 +537,7 @@ class Globals:
                 if resourceModuleList :
                     for resourceModule in resourceModuleList :
                         command = f'{Globals.PIP_INSTALL} {resourceModule}'
-                        processPath = f'{self.getApiPath(self.apiName)}{Globals.RESOURCE_BACK_SLASH}'
+                        processPath = f'{self.getApiPath(self.apiName)}{Globals.RESOURCE_BACK_SLASH}{Globals.DEPENDENCY_BACK_SLASH}'
                         subprocess.Popen(command,shell=True,cwd=processPath).wait()
                         ###- subprocess.run(command,shell=True,capture_output=True,cwd=processPath)
         except Exception as exception :
