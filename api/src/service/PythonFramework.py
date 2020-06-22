@@ -71,7 +71,7 @@ class PythonFramework:
         try :
             if self.apiClassSet :
                 apiClass = self.apiClassSet.get(commandList[self._0_API_KEY])
-                if apiClass and apiClass in [PythonFramework, GitCommitter] :
+                if apiClass and apiClass in [self.__class__, GitCommitter] :
                     globals.success(self.__class__, f'running {commandList} command list')
                     return self.handleCommandList(commandList)
                 elif apiClass :
@@ -80,7 +80,7 @@ class PythonFramework:
                     globals.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
                     return api.handleCommandList(commandList)
                 else :
-                    globals.failure(PythonFramework,'''couldn't instance api class''', globals.NOTHING)
+                    globals.failure(self.__class__,'''couldn't instance api class''', globals.NOTHING)
             else :
                 globals.debug(f'{commandList[self._0_API_KEY]} key called and running all alone')
                 return externalFunction(commandList,globals,**self.kwargs)
@@ -104,7 +104,7 @@ class PythonFramework:
             else :
                 secondErrorMessage = ''
                 thirdErrorMessage = ''
-            globals.error(PythonFramework, f'error processing "{commandList[self._0_API_KEY]}" call{secondErrorMessage}{thirdErrorMessage}', errorMessage)
+            globals.error(self.__class__, f'error processing "{commandList[self._0_API_KEY]}" call{secondErrorMessage}{thirdErrorMessage}', errorMessage)
 
     def __init__(self,*args,**kwargs):
         self.globals = args[-1]
@@ -226,7 +226,7 @@ class PythonFramework:
                 errorMessage = str(exception)
         else :
             errorMessage = 'failed to parse parameters'
-        globals.error(PythonFramework.__class__, f'failed to add api due {commandList} command list', errorMessage)
+        globals.error(self.__class__.__class__, f'failed to add api due {commandList} command list', errorMessage)
 
     def createCredentials(self,commandList):
         self.globals.debug(f'{self.__class__.__name__}.commandList = {commandList}')
@@ -240,7 +240,7 @@ class PythonFramework:
                 gitUrl = f'''{self.gitCommitter.gitUrl}/{apiClassName}.{self.gitCommitter.gitExtension}'''
             return apiKey, apiClassName, gitUrl
         except Exception as exception :
-            print(f'''{self.globals.ERROR}{PythonFramework.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
+            print(f'''{self.globals.ERROR}{self.__class__.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
 
     @SessionMethod
     def printCommandList(self,commandList):

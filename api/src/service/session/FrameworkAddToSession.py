@@ -43,7 +43,7 @@ def getCredentials(self,commandList) :
             gitUrl = f'''{self.gitCommitter.gitUrl}/{apiClassName}.{self.gitCommitter.gitExtension}'''
         return sessionKey, apiKey, apiClassName, gitUrl
     except Exception as exception :
-        self.printError(f'''{self.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
+        self.printError(f'''{self.__class__.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
 
 def getSession(self,sessionKey) :
     globals = self.globals

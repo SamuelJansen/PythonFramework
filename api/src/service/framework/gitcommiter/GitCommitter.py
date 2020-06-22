@@ -50,11 +50,11 @@ class GitCommitter:
         print(f'GitCommitter.commandList = {commandList}')
         globals = self.globals
         if len(commandList) < GitCommitter.COMMAND_INDEX :
-            print(f'{globals.ERROR}{GitCommitter.MISSING_SPACE}{GitCommand.GIT_COMMITTER} command')
+            print(f'{globals.ERROR}{GitCommitter.MISSING_SPACE}{GitCommand.API_KEY_GIT_COMMITTER} command')
             return
         gitCommiterCallCommand = commandList[GitCommitter.GIT_COMMITTER_INDEX]
         command = commandList[GitCommitter.COMMAND_INDEX]
-        if GitCommand.GIT_COMMITTER == gitCommiterCallCommand :
+        if GitCommand.API_KEY_GIT_COMMITTER == gitCommiterCallCommand :
             try :
                 return self.commandSet[command](commandList)
             except Exception as exception :

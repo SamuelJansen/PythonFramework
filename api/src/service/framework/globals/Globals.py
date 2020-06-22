@@ -106,14 +106,6 @@ class Globals:
 
     SAFE_AMOUNT_OF_TRIPLE_SINGLE_OR_DOUBLE_QUOTES_PLUS_ONE = 4
 
-    # GIT_COMMITTER = 'git-committer'
-    # OFFICE_TRACK_INTEGRATION_TESTS = 'office-track-integration-tests'
-    # VOICE_ASSISTANT = 'voice-assistant'
-    # WEB_SCRAP_HELPER = 'web-scraper'
-    # CIFRAS_CLUB_WEB_SCRAPER = f'cifras-club-{WEB_SCRAP_HELPER}'
-    # FACEBOOK_CLASS_MANAGER = f'facebook-class'
-    # API_SYS_ARGV_INDEX = 1
-
     DEBUG =     '[DEBUG  ] '
     ERROR =     '[ERROR  ] '
     WARNING =   '[WARNING] '
