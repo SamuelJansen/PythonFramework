@@ -149,10 +149,8 @@ class Globals:
         self.apisRoot = self.currentPath.split(self.localPath)[1].split(self.apiName)[0]
 
         self.settingTree = self.getSettingTree()
-        try :
-            self.extension = self.getSetting(f'{self.globalsName}.{AttributeKey.API_EXTENSION}',self.settingTree)
-        except :
-            self.extension = Globals.EXTENSION
+        self.extension = self.getExtension()
+
 
         self.printStatus = self.getGlobalsPrintStatus()
         self.apiNameList = self.getGlobalsApiNameList()
@@ -548,7 +546,11 @@ class Globals:
             self.apiNameList.append(apiName)
 
     def getExtension(self):
-        return self.extension
+        try :
+            return self.getSetting(f'{self.globalsName}.{AttributeKey.API_EXTENSION}',self.settingTree)
+        except Exception as exception :
+            self.failure(self.__class__,'Not possible to get api extenion. Returning default estension', exception)
+            return Globals.EXTENSION
 
     def getSettingFromSettingFilePathAndKeyPair(self,path,settingKey) :
         self.debug(f'''Getting {settingKey} from {path}''')
