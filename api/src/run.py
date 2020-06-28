@@ -4,11 +4,11 @@ def pythonFrameworkDefaultRun(commandList,globals,**kwargs):
 if __name__ == '__main__' :
     from service.framework.globals import Globals
     globals = Globals.Globals(
-        debugStatus = False,
+        debugStatus = True,
         errorStatus = True,
         successStatus = True,
         failureStatus = True,
-        settingStatus = False
+        settingStatus = True
     )
     import PythonFramework
     PythonFramework.run(pythonFrameworkDefaultRun,globals)

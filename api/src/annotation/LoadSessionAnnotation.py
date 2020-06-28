@@ -18,7 +18,7 @@ def LoadSession(function,*annotatinArgs,**annotationKwargs) :
                 self.session = getBasicSession(self)
                 self.globals.failure(self.__class__,f'''couldn't find any active session. Running "{self.session.key}" session.''',self.globals.NOTHING)
         except Exception as exception :
-            print(f'''{Constant.WRAPPER}Failed to load framework session. Cause: {str(exception)}''')
+            print(f'''{Constant.WRAPPER}{SessionMethod.__name__} failed to load framework session. Cause: {str(exception)}''')
         return function(*args,**kwargs)
     return wraperMethod
 

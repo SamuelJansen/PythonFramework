@@ -204,7 +204,7 @@ class Globals:
             apiTree = self.makePathTreeVisible(self.getApiPath(apiName))
             self.apiTree[apiName] = apiTree
         except Exception as exception :
-            self.debug(f'Not possible to make {apiName} api avaliable{Globals.NEW_LINE}{str(exception)}')
+            self.failure(self.__class__,f'Not possible to make {apiName} api avaliable',exception)
 
     def makePathTreeVisible(self,path):
         node = {}

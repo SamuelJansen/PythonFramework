@@ -116,11 +116,7 @@ class PythonFramework:
         self.repository = SqlAlchemyHelper(self.repositoryName,model=Model)
         self.importApplicationScriptPath = f'{self.globals.apiPath}{self.globals.baseApiPath}runtime{self.globals.BACK_SLASH}{IMPORT_SCRITP_FILE_NAME}.{self.globals.PYTHON_EXTENSION}'
 
-        self.apiClassSet = self.loadApiClassSet()
-        self.gitCommitter = self.apiClassSet[self.API_KEY_GIT_COMMITTER](self.session,self.globals)
-
         self.apiSet = {}
-        self.apiSet[self.API_KEY_GIT_COMMITTER] = self.gitCommitter.commandSet
         self.apiSet[self.API_KEY_FRAMEWORK] = {
             self.COMMAND_ADD_API_BY_KEY_VALUE : self.addApiByKeyValue,
 
@@ -137,6 +133,9 @@ class PythonFramework:
             self.COMMAND_SESSION_COMMAND_LIST : self.sessionCommandList,
             self.COMMAND_COMMAND_LIST : self.printCommandList
         }
+        self.apiClassSet = self.loadApiClassSet()
+        self.gitCommitter = GitCommitter(self.session,self.globals)
+        self.apiSet[self.API_KEY_GIT_COMMITTER] = self.gitCommitter.commandSet
 
     @LoadSession
     def loadApiClassSet(self):

@@ -17,5 +17,5 @@ def SessionMethod(function,*args,**kwargs) :
                     methodName = f' {methodName}'
             except :
                 methodName = ''
-            print(f'''{Constant.WRAPPER}Failed to execute{className}{methodName} method. Cause: {str(exception)}''')
+            print(f'''{Constant.WRAPPER}{SessionMethod.__name__} failed to execute{className}{methodName} method. Cause: {str(exception)}''')
     return wraperMethod
