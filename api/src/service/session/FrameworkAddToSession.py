@@ -40,7 +40,7 @@ def getCredentials(self,commandList) :
         if len(commandList[self._3_ARGUMENT:]) > self._3_ARGUMENT :
             gitUrl = commandList[self._3_ARGUMENT]
         else :
-            gitUrl = f'''{self.gitCommitter.gitUrl}/{apiClassName}.{self.gitCommitter.gitExtension}'''
+            gitUrl = f'''{self.gitCommitter.gitUrl}{apiClassName}.{self.gitCommitter.gitExtension}'''
         return sessionKey, apiKey, apiClassName, gitUrl
     except Exception as exception :
         self.printError(f'''{self.__class__.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')

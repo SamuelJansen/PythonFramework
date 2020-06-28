@@ -23,12 +23,15 @@ def LoadSession(function,*annotatinArgs,**annotationKwargs) :
     return wraperMethod
 
 def getBasicSession(self) :
+    basicSessionKey = self.globals.getApiSetting('api.basic.session.key')
+    apiList = getDefaultApiList(self)
+    return Session(basicSessionKey, FrameworkConstant.ACTIVE, apiList)
+
+def getDefaultApiList(self) :
     gitUrl = self.globals.getApiSetting('api.git.url')
     gitExtension = self.globals.getApiSetting('api.git.extension')
-    basicSessionKey = self.globals.getApiSetting('api.basic.session.key')
     apiKey = self.globals.getApiSetting('api.basic.api.key')
     apiClassName = self.globals.getApiSetting('api.basic.api.class-name')
-    import_script = ADD_APPLICATION_FILE_SCRIPT.replace(APPLICATION_TOKEN,apiClassName)
+    importScript = ADD_APPLICATION_FILE_SCRIPT.replace(APPLICATION_TOKEN,apiClassName)
     sessionList = []
-    apiList = [Api(apiKey,apiClassName,f'''{gitUrl}/{apiClassName}.{gitExtension}''',import_script, sessionList)]
-    return Session(basicSessionKey, FrameworkConstant.ACTIVE, apiList)
+    return [Api(apiKey,apiClassName,f'''{gitUrl}/{apiClassName}.{gitExtension}''',import_script, sessionList)]
