@@ -364,7 +364,9 @@ class Globals:
             tree[settingKey] = newSetting[settingKey]
 
     def getApiSetting(self,attributeKeyWithoutApiNameAsRoot):
-        return self.getSetting(AttributeKey.getKey(self,attributeKeyWithoutApiNameAsRoot))
+        setting = self.getSetting(AttributeKey.getKey(self,attributeKeyWithoutApiNameAsRoot))
+        self.setting(self.__class__,f'''{attributeKeyWithoutApiNameAsRoot} : {setting}''')
+        return setting
 
     def getSetting(self,nodeKey,settingTree=None) :
         if not settingTree :

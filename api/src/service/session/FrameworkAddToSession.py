@@ -1,4 +1,4 @@
-from PythonFrameworkApplicationScript import *
+from PythonFrameworkApplicationScript import ADD_APPLICATION_FILE_SCRIPT, APPLICATION_TOKEN, IMPORT_SCRITP_FILE_NAME
 import Api, Session
 Api = Api.Api
 Session = Session.Session

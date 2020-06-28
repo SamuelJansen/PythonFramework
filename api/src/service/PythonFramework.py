@@ -11,7 +11,7 @@ import FrameworkSessionHelper
 Api = Api.Api
 Session = Session.Session
 GitCommitter = GitCommitter.GitCommitter
-# SqlAlchemyHelper = SqlAlchemyHelper.SqlAlchemyHelper
+SqlAlchemyHelper = SqlAlchemyHelper.SqlAlchemyHelper
 FrameworkStatus = FrameworkConstant.Status
 
 class PythonFramework:
@@ -65,7 +65,7 @@ class PythonFramework:
         globals.debug(f'session = {self.session}')
         return self.apiSet[commandList[self._0_API_KEY]][commandList[self._1_COMMAND]](commandList)
 
-    @LoadSession
+    @SessionMethod
     def handleSystemArgumentValue(self,commandList,externalFunction):
         globals = self.globals
         try :
@@ -80,7 +80,7 @@ class PythonFramework:
                     globals.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
                     return api.handleCommandList(commandList)
                 else :
-                    globals.failure(self.__class__,'''couldn't instance api class''', globals.NOTHING)
+                    globals.failure(self.__class__,f'''couldn't instance {apiClass} api class''', globals.NOTHING)
             else :
                 globals.debug(f'{commandList[self._0_API_KEY]} key called and running all alone')
                 return externalFunction(commandList,globals,**self.kwargs)
@@ -113,11 +113,14 @@ class PythonFramework:
         self.kwargs = kwargs
         self.name = self.globals.getApiSetting('api.name')
         self.repositoryName = self.name
-        self.repository = SqlAlchemyHelper.SqlAlchemyHelper(self.repositoryName,model=Model)
-        # self.repository.run()
+        self.repository = SqlAlchemyHelper(self.repositoryName,model=Model)
         self.importApplicationScriptPath = f'{self.globals.apiPath}{self.globals.baseApiPath}runtime{self.globals.BACK_SLASH}{IMPORT_SCRITP_FILE_NAME}.{self.globals.PYTHON_EXTENSION}'
 
+        self.apiClassSet = self.loadApiClassSet()
+        self.gitCommitter = self.apiClassSet[self.API_KEY_GIT_COMMITTER](self.session,self.globals)
+
         self.apiSet = {}
+        self.apiSet[self.API_KEY_GIT_COMMITTER] = self.gitCommitter.commandSet
         self.apiSet[self.API_KEY_FRAMEWORK] = {
             self.COMMAND_ADD_API_BY_KEY_VALUE : self.addApiByKeyValue,
 
@@ -127,28 +130,17 @@ class PythonFramework:
             self.COMMAND_SAVE_SESSION : self.saveSession,
             self.COMMAND_OPEN_SESSION : self.openSession,
             self.COMMAND_PRINT_SESSION : self.printSession,
-            self.COMMAND_SESSION_COMMAND_LIST : self.sessionCommandList,
             self.COMMAND_CLOSE_SESSION : self.closeSession,
 
             self.COMMAND_LIST_ALL_SESSION : self.listAllSession,
 
+            self.COMMAND_SESSION_COMMAND_LIST : self.sessionCommandList,
             self.COMMAND_COMMAND_LIST : self.printCommandList
         }
-        self.apiClassSet = {
-            self.API_KEY_FRAMEWORK : PythonFramework,
-            self.API_KEY_GIT_COMMITTER : GitCommitter
-        }
-        self.gitCommitter = self.getGitCommitter()
-        self.apiSet[self.API_KEY_GIT_COMMITTER] = self.gitCommitter.commandSet
-        self.loadApiClassSet()
 
     @LoadSession
-    def getGitCommitter(self):
-        return GitCommitter(self.session,self.globals)
-
-    @SessionMethod
     def loadApiClassSet(self):
-        FrameworkLoadApiClassSet.loadApiClassSet(self)
+        return FrameworkLoadApiClassSet.loadApiClassSet(self)
 
     @SessionMethod
     def newSession(self,commandList):
@@ -180,10 +172,6 @@ class PythonFramework:
     @SessionMethod
     def printSession(self,commandList):
         return FrameworkPrintSession.printSession(self,commandList)
-
-    @SessionMethod
-    def sessionCommandList(self,commandList):
-        self.globals.printTree(self.apiSet,f'{self.globals.TAB}Command list: ',depth=2)
 
     @SessionMethod
     def closeSession(self,commandList):
@@ -240,7 +228,11 @@ class PythonFramework:
                 gitUrl = f'''{self.gitCommitter.gitUrl}/{apiClassName}.{self.gitCommitter.gitExtension}'''
             return apiKey, apiClassName, gitUrl
         except Exception as exception :
-            print(f'''{self.globals.ERROR}{self.__class__.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
+            self.printError(self.__class__, f'''{self.__class__.__name__} error handling commandList "{commandList}"''', exception)
+
+    @SessionMethod
+    def sessionCommandList(self,commandList):
+        self.globals.printTree(self.apiSet,f'{self.globals.TAB}Command list: ',depth=2)
 
     @SessionMethod
     def printCommandList(self,commandList):
