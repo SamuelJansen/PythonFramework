@@ -24,8 +24,6 @@ def loadApiClassSet(self) :
     return apiClassSet
 
 def loadApiClass(self,api) :
-    print()
-    print(api.key, api.class_name)
     if api.class_name not in self.globals.apiNameList :
         self.globals.makeApiAvaliable(api.class_name)
     try :

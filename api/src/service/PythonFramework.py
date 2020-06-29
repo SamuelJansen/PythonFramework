@@ -75,7 +75,7 @@ class PythonFramework:
                     globals.success(self.__class__, f'running {commandList} command list')
                     return self.handleCommandList(commandList)
                 elif apiClass :
-                    globals.overrideApiTree(apiClass.__name__)
+                    globals.overrideApiTree(apiClass.__name__,package=apiClass.__name__)
                     api = apiClass(*self.args,**self.kwargs)
                     globals.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
                     return api.handleCommandList(commandList)
