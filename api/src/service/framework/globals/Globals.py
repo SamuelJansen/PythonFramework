@@ -637,8 +637,14 @@ class Globals:
             print(f'{Globals.SETTING}{classPortion}{message}')
 
 def getGlobals() :
-    from app import globals
-    return globals
+    try :
+        from app import globals
+        return globals
+    except :
+        try :
+            from run import globals
+            return globals
+        except : pass
 
 def getApi() :
     return getGlobals().api

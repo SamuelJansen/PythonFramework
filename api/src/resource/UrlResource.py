@@ -1,0 +1,2 @@
+HOME = '/'
+GLOBALS = '/config'

@@ -1,0 +1,7 @@
+Flask
+Flask-RESTful
+Flask-JWT-Extended
+Flask-SQLAlchemy
+requests
+gunicorn
+psycopg2-binary
