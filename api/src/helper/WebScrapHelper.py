@@ -68,7 +68,7 @@ class WebScrapHelper(SeleniumHelper.SeleniumHelper):
         if not self.databaseName :
             self.databaseName = self.name
         self.repository = SqlAlchemyHelper.SqlAlchemyHelper(
-            self.databaseName,
+            name = self.databaseName,
             dialect = self.repositoryDialect,
             user = self.repositoryUser,
             password = self.repositoryPassword,

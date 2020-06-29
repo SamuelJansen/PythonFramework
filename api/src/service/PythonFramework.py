@@ -112,8 +112,7 @@ class PythonFramework:
         self.args = args[:-2]
         self.kwargs = kwargs
         self.name = self.globals.getApiSetting('api.name')
-        self.repositoryName = self.name
-        self.repository = SqlAlchemyHelper(self.repositoryName,model=Model)
+        self.repository = SqlAlchemyHelper(model=Model,globals=self.globals)
         self.importApplicationScriptPath = f'{self.globals.apiPath}{self.globals.baseApiPath}runtime{self.globals.BACK_SLASH}{IMPORT_SCRITP_FILE_NAME}.{self.globals.PYTHON_EXTENSION}'
 
         self.apiSet = {}

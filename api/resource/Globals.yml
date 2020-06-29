@@ -2,23 +2,30 @@ Globals:
     print-status: False
     api:
         name: framework
-        basic:
-            session:
-                key: basic-framework
-            api:
-                key : python-framework
-                class-name: PythonFramework
-        list: [PythonFramework] ###- [PythonFramework]
+        repository :
+            dialect: postgres
+            user: jbqafgvnjszmoh
+            password: 9a4b08000c04c22cd6f533c5ac76098102aecdb646e9bc2fb3d9a74089fcebc9
+            host: ec2-35-173-94-156.compute-1.amazonaws.com
+            port: 5432
+            database: d5h5kfi694bmst
         extension: yml
         dependency:
             update: False
             list:
                 web: [Popen,Path,pygame,numpy,pywin32,SpeechRecognition,PyTTSx,webdriver_manager,selenium,sqlalchemy,pyautogui,wit,psycopg2] ###- pyaudio,python-Levenshtein
                 local: [PyAudio-0.2.11-cp38-cp38-win32.whl,python_Levenshtein-0.12.0-cp38-cp38-win32.whl]
+        list: [PythonFramework] ###- [PythonFramework]
         language: EN-US ###- PT-BR ###-
         git:
             url: https://github.com/SamuelJansen/
             extension: git
+        basic:
+            session:
+                key: basic-framework
+            api:
+                key : python-framework
+                class-name: PythonFramework
     python:
         version: '3.8'
         version-command: python --version
