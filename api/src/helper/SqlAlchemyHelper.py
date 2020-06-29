@@ -67,7 +67,6 @@ class SqlAlchemyHelper:
             self.dialect = self.DEFAULT_DATABASE_TYPE
 
         self.databaseUrl = f'{self.dialect}:{self.DOUBLE_BAR}{use_password_host}{self.name}'
-        print(f'self.databaseUrl = {self.databaseUrl}')
 
         self.engine = create_engine(self.databaseUrl, echo=echo)
         self.session = scoped_session(sessionmaker(self.engine)) ###- sessionmaker(bind=self.engine)()

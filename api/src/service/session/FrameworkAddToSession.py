@@ -1,4 +1,4 @@
-from PythonFrameworkApplicationScript import *
+from PythonFrameworkApplicationScript import ADD_APPLICATION_FILE_SCRIPT, APPLICATION_TOKEN, IMPORT_SCRITP_FILE_NAME
 import Api, Session
 Api = Api.Api
 Session = Session.Session
@@ -40,10 +40,10 @@ def getCredentials(self,commandList) :
         if len(commandList[self._3_ARGUMENT:]) > self._3_ARGUMENT :
             gitUrl = commandList[self._3_ARGUMENT]
         else :
-            gitUrl = f'''{self.gitCommitter.gitUrl}/{apiClassName}.{self.gitCommitter.gitExtension}'''
+            gitUrl = f'''{self.gitCommitter.gitUrl}{apiClassName}.{self.gitCommitter.gitExtension}'''
         return sessionKey, apiKey, apiClassName, gitUrl
     except Exception as exception :
-        self.printError(f'''{self.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
+        self.printError(f'''{self.__class__.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')
 
 def getSession(self,sessionKey) :
     globals = self.globals

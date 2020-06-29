@@ -7,8 +7,8 @@ class Session(Model):
     __tablename__ = SESSION
 
     id = Column(Integer(), Sequence(f'{__tablename__}_id_seq'), primary_key=True)
-    key = Column(String(128),unique=True)
-    status = Column(String(64),unique=True)
+    key = Column(String(128), unique=True)
+    status = Column(String(64))
     api_list = relationship(CLASS_API, secondary=apiToSessionAssociation, back_populates=f'{__tablename__}_list')
 
     def __init__(self,key,status,api_list):

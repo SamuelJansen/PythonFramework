@@ -2,6 +2,12 @@ Globals:
     print-status: False
     api:
         name: framework
+        basic:
+            session:
+                key: basic-framework
+            api:
+                key : python-framework
+                class-name: PythonFramework
         list: [PythonFramework] ###- [PythonFramework]
         extension: yml
         dependency:
