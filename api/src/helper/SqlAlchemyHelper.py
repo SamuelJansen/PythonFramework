@@ -98,13 +98,14 @@ class SqlAlchemyHelper:
         else :
             self.name = name
 
-
-        print(f'dialect = {self.dialect}')
-        print(f'user = {self.user}')
-        print(f'password = {self.password}')
-        print(f'host = {self.host}')
-        print(f'port = {self.port}')
-        print(f'name = {self.name}')
+        if globals :
+            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}Repository consiguration:')
+            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}dialect = {self.dialect}')
+            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}user = {self.user}')
+            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}password = {self.password}')
+            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}host = {self.host}')
+            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}port = {self.port}')
+            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}name = {self.name}')
 
         user_password_host = self.NOTHING
         if self.user and self.password :
