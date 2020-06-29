@@ -1,8 +1,8 @@
 import UrlResource, HomeResource, GlobalsResource
-#
+
 resourceSet = {
-    HomeResource.HomeResource : '/',
-    GlobalsResource.GlobalsResource : '/config'
+    HomeResource.HomeResource : UrlResource.HOME,
+    GlobalsResource.GlobalsResource : UrlResource.GLOBALS
 }
 
 def addTo(api) :

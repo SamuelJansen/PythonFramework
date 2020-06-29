@@ -42,6 +42,8 @@ class PythonFramework:
 
     COMMAND_LIST_ALL_SESSION = 'list-all-session'
 
+    COMMAND_RUN_FLASK = 'run-flask'
+
     COMMAND_COMMAND_LIST = 'command-list'
     commandList = {
         COMMAND_ADD_API_BY_KEY_VALUE : [],
@@ -53,7 +55,9 @@ class PythonFramework:
         COMMAND_PRINT_SESSION : [],
         COMMAND_SESSION_COMMAND_LIST : [],
         COMMAND_CLOSE_SESSION : [],
-        COMMAND_LIST_ALL_SESSION : []
+        COMMAND_LIST_ALL_SESSION : [],
+
+        COMMAND_RUN_FLASK : []
     }
 
     KW_GIT_COMMITTER = API_KEY_GIT_COMMITTER
@@ -130,7 +134,9 @@ class PythonFramework:
             self.COMMAND_LIST_ALL_SESSION : self.listAllSession,
 
             self.COMMAND_SESSION_COMMAND_LIST : self.sessionCommandList,
-            self.COMMAND_COMMAND_LIST : self.printCommandList
+            self.COMMAND_COMMAND_LIST : self.printCommandList,
+
+            self.COMMAND_RUN_FLASK : self.runFlask
         }
         self.apiClassSet = self.loadApiClassSet()
         self.gitCommitter = GitCommitter(self.session,self.globals)
@@ -139,6 +145,11 @@ class PythonFramework:
     @LoadSession
     def loadApiClassSet(self):
         return FrameworkLoadApiClassSet.loadApiClassSet(self)
+
+    @SessionMethod
+    def runFlask(self,commandList) :
+        from PythonFrameworkFlask import application
+        return application.run()
 
     @SessionMethod
     def newSession(self,commandList):

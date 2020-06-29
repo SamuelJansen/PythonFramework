@@ -1,7 +1,7 @@
 from flask_restful import Resource
 import Globals, UrlResource
 
-@Globals.Resource(path='/config')
+@Globals.Resource(path = UrlResource.GLOBALS)
 class GlobalsResource(Resource):
 
     def get(self):
