@@ -99,13 +99,13 @@ class SqlAlchemyHelper:
             self.name = name
 
         if globals :
-            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}Repository consiguration:')
-            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}dialect = {self.dialect}')
-            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}user = {self.user}')
-            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}password = {self.password}')
-            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}host = {self.host}')
-            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}port = {self.port}')
-            globals.debug(f'{2* globals.TAB_UNITS * globals.SPACE}name = {self.name}')
+            globals.debug(f'Repository consiguration:')
+            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}dialect = {self.dialect}')
+            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}user = {self.user}')
+            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}password = {self.password}')
+            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}host = {self.host}')
+            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}port = {self.port}')
+            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}name = {self.name}')
 
         user_password_host = self.NOTHING
         if self.user and self.password :
