@@ -20,9 +20,6 @@ Sequence = Sequence
 ForeignKey = ForeignKey
 MetaData = MetaData
 
-# Model = declarative_base()
-
-
 KW_API = 'api'
 KW_NAME = 'name'
 KW_MAIN_URL = 'main-url'
@@ -34,7 +31,6 @@ KW_REPOSITORY_PASSWORD = 'password'
 KW_REPOSITORY_HOST = 'host'
 KW_REPOSITORY_PORT = 'port'
 KW_REPOSITORY_DATABASE = 'database'
-
 
 def getNewModel() :
     return declarative_base()
