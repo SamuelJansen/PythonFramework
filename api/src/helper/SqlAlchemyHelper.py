@@ -101,8 +101,8 @@ class SqlAlchemyHelper:
         if globals :
             globals.debug(f'Repository consiguration:')
             globals.debug(f'{globals.TAB_UNITS * globals.SPACE}dialect = {self.dialect}')
-            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}user = {self.user}')
-            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}password = {self.password}')
+            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}user = wops!')
+            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}password = wops!')
             globals.debug(f'{globals.TAB_UNITS * globals.SPACE}host = {self.host}')
             globals.debug(f'{globals.TAB_UNITS * globals.SPACE}port = {self.port}')
             globals.debug(f'{globals.TAB_UNITS * globals.SPACE}name = {self.name}')
