@@ -28,7 +28,6 @@ elif not __name__ == 'run' :
     ###- It's a Flask build
     app = PythonFrameworkFlask.application
     app.run(debug=True)
-
 else :
     import Globals
     globals = Globals.Globals(
