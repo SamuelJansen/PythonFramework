@@ -13,16 +13,17 @@ def addToSession(self,commandList):
     if apiKey and apiClassName and gitUrl :
         try :
             importApplicationScript = ADD_APPLICATION_FILE_SCRIPT.replace(APPLICATION_TOKEN,apiClassName)
-            if self.repository.existsByKey(apiKey,Api) :
-                api = self.repository.findByKey(apiKey,Api)
+            if self.repository.existsByKeyAndCommit(apiKey,Api) :
+                api = self.repository.findByKeyAndCommit(apiKey,Api)
                 if api not in session.api_list :
                     session.api_list.append(api)
-                    self.repository.saveAll(session.api_list)
+                    self.repository.saveAllAndCommit(session.api_list)
                     self.printSuccess(f'"{api.key}" : "{api.class_name}" added successfully')
-                globals.debug(f'{globals.TAB}{globals.WARNING}"{api.key}" : "{api.class_name}" already belongs to "{session.key}" session')
+                else :
+                    globals.warning(f'"{api.key}" : "{api.class_name}" api already belongs to "{session.key}" session')
             else :
                 newApi = Api(apiKey,apiClassName,gitUrl,importApplicationScript,[session])
-                newApi = self.repository.save(newApi)
+                newApi = self.repository.saveAndCommit(newApi)
                 self.printSuccess(f'"{newApi.key}" : "{newApi.class_name}" added successfully')
             return
         except Exception as exception :
@@ -47,9 +48,9 @@ def getCredentials(self,commandList) :
 
 def getSession(self,sessionKey) :
     globals = self.globals
-    if self.repository.existsByKey(sessionKey,Session) :
+    if self.repository.existsByKeyAndCommit(sessionKey,Session) :
         globals.debug(f'{globals.TAB}{globals.WARNING}"{sessionKey}" session key already exists')
-        return self.repository.findByKey(sessionKey,Session)
+        return self.repository.findByKeyAndCommit(sessionKey,Session)
     else :
         newSession = Session(sessionKey,FrameworkStatus[FrameworkConstant.INACTIVE],[])
-        return self.repository.save(newSession)
+        return self.repository.saveAndCommit(newSession)

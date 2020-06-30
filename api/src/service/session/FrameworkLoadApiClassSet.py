@@ -37,6 +37,5 @@ def loadApiClass(self,api) :
         self.globals.error(self.__class__,f'Not possible to reach {api.key} due command line',exception)
 
 def eraseImportApplicationScript(self) :
-    blankScript = ''
     with open(self.importApplicationScriptPath,self.globals.OVERRIDE,encoding = self.globals.ENCODING) as scriptFile :
-        scriptFile.write(''.join(blankScript))
+        scriptFile.write('')

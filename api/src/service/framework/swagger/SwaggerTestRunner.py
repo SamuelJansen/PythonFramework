@@ -15,11 +15,12 @@ def runTestCase(swagger,tagSet,testCaseKey,testCaseValues) :
     tag = getTag(swagger,testCaseValues,tagSet)
     method = swagger.getFilteredSetting(integration.METHOD,testCaseValues)
     verb = swagger.getFilteredSetting(integration.VERB,testCaseValues)
+    authorizaton = getAuthoization(swagger,testCaseValues)
     processingTime = swagger.getFilteredSetting(integration.PROCESSING_TIME,testCaseValues)
     payload = swagger.getFilteredSetting(integration.PAYLOAD,testCaseValues)
     expectedResponse = swagger.getFilteredSetting(integration.EXPECTED_RESPONSE,testCaseValues)
     ignoreKeyList = getIgnoreKeyList(swagger,testCaseValues)
-    response = swagger.runTest(url,tag,method,verb,processingTime,payload,expectedResponse)
+    response = swagger.runTest(url,tag,method,verb,authorizaton,processingTime,payload,expectedResponse)
     filteredExpectedResponseAsDict = ObjectHelper.filterIgnoreKeyList(json.loads(expectedResponse),ignoreKeyList)
     filteredResponseAsDict = ObjectHelper.filterIgnoreKeyList(json.loads(response),ignoreKeyList)
     success = ObjectHelper.equal(filteredResponseAsDict,filteredExpectedResponseAsDict)
@@ -44,6 +45,12 @@ def getUrl(swagger,testCaseValues) :
     if not url :
         return swagger.mainUrl
     return url
+
+def getAuthoization(swagger,testCaseValues) :
+    authorizaton = swagger.getFilteredSetting(integration.AUTHORIZATION,testCaseValues)
+    if not authorizaton :
+        return swagger.authorizationAdmin
+    return authorizaton
 
 def getTag(swagger,testCaseValues,tagSet) :
     tag = swagger.getFilteredSetting(integration.TAG,testCaseValues)

@@ -6,20 +6,20 @@ Api = Api.Api
 
 def getBasicSession(self):
     basicSession = getBasicSession(self)
-    return self.repository.save(basicSession)
+    return self.repository.saveAndCommit(basicSession)
 
 def getBasicSession(self) :
     basicSessionKey = self.globals.getApiSetting('api.basic.session.key')
-    if self.repository.existsByKey(basicSessionKey,Session) :
-        return self.repository.findByKey(basicSessionKey,Session)
+    if self.repository.existsByKeyAndCommit(basicSessionKey,Session) :
+        return self.repository.findByKeyAndCommit(basicSessionKey,Session)
     else :
         apiList = getDefaultApiList(self)
-        return self.repository.save(Session(basicSessionKey,FrameworkConstant.ACTIVE,apiList))
+        return self.repository.saveAndCommit(Session(basicSessionKey,FrameworkConstant.ACTIVE,apiList))
 
 def getDefaultApiList(self) :
     apiKey = self.globals.getApiSetting('api.basic.api.key')
-    if (self.repository.existsByKey(apiKey,Api)) :
-        return [self.repository.findByKey(apiKey,Api)]
+    if (self.repository.existsByKeyAndCommit(apiKey,Api)) :
+        return [self.repository.findByKeyAndCommit(apiKey,Api)]
     else :
         apiClassName = self.globals.getApiSetting('api.basic.api.class-name')
         gitUrl = self.globals.getApiSetting('api.git.url')

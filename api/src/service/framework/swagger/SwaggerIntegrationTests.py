@@ -2,7 +2,10 @@ import SeleniumHelper, SwaggerTestRunner, SettingHelper
 
 INTEGRATION_FOLDER = 'integration'
 
+KW_AUTHORIZATION = 'authorization'
 KW_MAIN_SWAGGER_URL = 'main-swagger-url'
+KW_AUTHORIZATION_ADMIN = f'{KW_AUTHORIZATION}-admin'
+KW_AUTHORIZATION_USER = f'{KW_AUTHORIZATION}-user'
 KW_TEST_CASE = 'testCase'
 KW_INTEGRATION = INTEGRATION_FOLDER
 
@@ -10,6 +13,7 @@ URL = 'url'
 TAG = 'tag'
 METHOD = 'method'
 VERB = 'verb'
+AUTHORIZATION = KW_AUTHORIZATION
 PROCESSING_TIME = 'processingTime'
 PAYLOAD = 'payload'
 EXPECTED_RESPONSE = 'expectedResponse'
@@ -25,28 +29,32 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
         self.integrationPath = f'{globals.apiPath}{globals.baseApiPath}{INTEGRATION_FOLDER}{globals.BACK_SLASH}'
         self.mainSwaggerUrlFilePath = f'{self.integrationPath}{KW_INTEGRATION}.{self.globals.extension}'
         self.mainUrl = self.getFilteredSetting(KW_MAIN_SWAGGER_URL,globals.getSettingTree(settingFilePath=self.mainSwaggerUrlFilePath))
+        self.authorizationAdmin = self.getFilteredSetting(KW_AUTHORIZATION_ADMIN,globals.getSettingTree(settingFilePath=self.mainSwaggerUrlFilePath))
+        self.authorizationUser = self.getFilteredSetting(KW_AUTHORIZATION_USER,globals.getSettingTree(settingFilePath=self.mainSwaggerUrlFilePath))
 
     def runTestSet(self,testSet):
         SwaggerTestRunner.runTestSet(self,testSet)
 
-    def runTest(self,url,tag,method,verb,processingTime,payload,expectedResponse) :
-        self.resetValues(url,tag,method,verb,processingTime,payload,expectedResponse)
+    def runTest(self,url,tag,method,verb,authorization,processingTime,payload,expectedResponse) :
+        self.resetValues(url,tag,method,verb,authorization,processingTime,payload,expectedResponse)
         swaggerUrl = self.accessSwaggerUrl()
         swaggerTag = self.accessSwaggerTag(swaggerUrl)
         swaggerMethod = self.accessSwaggerMethod(swaggerTag)
         self.hitTryOut(swaggerMethod)
+        self.typeAuthorizaton(swaggerMethod)
         self.typePayload(swaggerMethod)
         self.hitExecute(swaggerMethod)
         self.waitProcessingTime()
         response = self.getResponse(swaggerMethod)
         return response
 
-    def resetValues(self,url,tag,method,verb,processingTime,payload,expectedResponse):
+    def resetValues(self,url,tag,method,verb,authorization,processingTime,payload,expectedResponse):
         globals = self.globals
         self.url = url
         self.tag = tag
         self.method = method
         self.verb = verb
+        self.authorization = authorization
         self.processingTime = processingTime
         self.payload = payload
         self.expectedResponse = expectedResponse
@@ -64,6 +72,9 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
 
     def hitTryOut(self,swaggerMethod):
         self.accessButton(self.findByClass(SwaggerKeyWord.TRY_OUT,swaggerMethod))
+
+    def typeAuthorizaton(self,swaggerMethod):
+        self.typeInSwagger(self.authorization,self.findBySelector(SwaggerKeyWord.SELECTOR_AUTHORIZATION,swaggerMethod))
 
     def typePayload(self,swaggerMethod):
         self.typeInSwagger(self.payload,self.findByClass(SwaggerKeyWord.BODY_PARAM,swaggerMethod))
@@ -91,6 +102,8 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
 
 
 class SwaggerKeyWord:
+
+    SELECTOR_AUTHORIZATION = '//tbody//tr//td//input[@placeholder="Authorization - Access Token"]'
 
     EXPAND_OPERATION = 'expand-operation'
     TRY_OUT = 'try-out'

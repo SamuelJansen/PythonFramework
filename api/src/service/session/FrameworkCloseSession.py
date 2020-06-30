@@ -10,7 +10,7 @@ def closeSession(self,commandList):
         sessionKey = commandList[self._0_ARGUMENT]
     else :
         sessionKey = self.session.key
-    session = self.repository.findByKey(sessionKey,Session)
+    session = self.repository.findByKeyAndCommit(sessionKey,Session)
     session.status = FrameworkStatus[FrameworkConstant.INACTIVE]
-    self.repository.save(session)
+    self.repository.saveAndCommit(session)
     self.printSuccess(f'"{sessionKey}" session closed successfully')

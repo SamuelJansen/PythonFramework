@@ -195,28 +195,28 @@ class PythonFramework:
             while sessionKey == globals.NOTHING :
                 sessionKey = input(f'{globals.TAB}Type session key: ')
                 if not sessionKey == globals.NOTHING :
-                    if self.repository.existsByKey(sessionKey,Session) :
-                        globals.debug(f'{globals.TAB}{globals.WARNING}"{sessionKey}" session key already exists')
-                        self.session = self.repository.findByKey(sessionKey,Session)
+                    if self.repository.existsByKeyAndCommit(sessionKey,Session) :
+                        globals.warning(f'"{sessionKey}" session key already exists')
+                        self.session = self.repository.findByKeyAndCommit(sessionKey,Session)
                     else :
                         newSession = Session(sessionKey,FrameworkStatus[FrameworkConstant.INACTIVE],[])
-                        self.session = self.repository.save(newSession)
+                        self.session = self.repository.saveAndCommit(newSession)
                     print(f'session = {self.session}')
         apiKey, apiClassName, gitUrl = self.createCredentials(commandList)
         if apiKey and apiClassName and gitUrl :
             try :
                 importApplicationScript = ADD_APPLICATION_FILE_SCRIPT.replace(APPLICATION_TOKEN,apiClassName)
-                if self.repository.existsByKey(apiKey,Api) :
-                    api = self.repository.findByKey(apiKey,Api)
+                if self.repository.existsByKeyAndCommit(apiKey,Api) :
+                    api = self.repository.findByKeyAndCommit(apiKey,Api)
                     if api not in self.session.api_list :
                         self.session.api_list.append(api)
-                        self.repository.saveAll(self.session.api_list)
+                        self.repository.saveAllAndCommit(self.session.api_list)
                         self.printSuccess(f'"{api.key}" : "{api.class_name}" added successfully')
-                    globals.debug(f'{globals.TAB}{globals.WARNING}"{api.key}" : "{api.class_name}" already belongs to "{self.session.key}" session')
+                    globals.warning(f'"{api.key}" : "{api.class_name}" api already exists')
                 else :
                     newApi = Api(apiKey,apiClassName,gitUrl,importApplicationScript,[self.session])
                     print(f'newApi = {newApi}')
-                    newApi = self.repository.save(newApi)
+                    newApi = self.repository.saveAndCommit(newApi)
                     self.printSuccess(f'"{newApi.key}" : "{newApi.class_name}" added successfully')
                 return
             except Exception as exception :

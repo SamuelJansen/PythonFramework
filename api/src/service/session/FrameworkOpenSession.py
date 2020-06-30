@@ -8,11 +8,11 @@ FrameworkStatus = FrameworkConstant.Status
 
 def openSession(self,commandList) :
     globals = self.globals
-    activeSessionList = self.repository.findAll(Session)
+    activeSessionList = self.repository.findAllAndCommit(Session)
     sessionKey = commandList[self._0_ARGUMENT]
-    if self.repository.existsByKey(sessionKey,Session) :
+    if self.repository.existsByKeyAndCommit(sessionKey,Session) :
         FrameworkSessionHelper.deactivateSessionList(self,activeSessionList)
-        FrameworkSessionHelper.activateSession(self,self.repository.findByKey(sessionKey,Session))
+        FrameworkSessionHelper.activateSession(self,self.repository.findByKeyAndCommit(sessionKey,Session))
         self.printSuccess(f'"{sessionKey}" session oppened successfully')
     else :
         self.printError(f'"{sessionKey}" session not found')

@@ -127,40 +127,54 @@ class SqlAlchemyHelper:
     def run(self):
         self.model.metadata.create_all(self.engine)
 
-    def saveNew(self,*args):
+    def saveNewAndCommit(self,*args):
         model = args[-1]
-        return self.save(model(*args[:-1]))
+        return self.saveAndCommit(model(*args[:-1]))
 
-    def save(self,instance):
+    def saveAndCommit(self,instance):
         self.session.add(instance)
         self.session.commit()
         return instance
 
-    def saveAll(self,instanceList):
+    def saveAllAndCommit(self,instanceList):
         self.session.add_all(instanceList)
         self.session.commit()
         return instanceList
 
-    def findAll(self,model):
-        return self.session.query(model).all()
+    def findAllAndCommit(self,model):
+        objectList = self.session.query(model).all()
+        self.session.commit()
+        return objectList
 
-    def findById(self,id,model):
-        return self.session.query(model).filter(model.id == id).first()
+    def findByIdAndCommit(self,id,model):
+        object = self.session.query(model).filter(model.id == id).first()
+        self.session.commit()
+        return object
 
-    def existsById(self,id,model):
+    def existsByIdAndCommit(self,id,model):
         # ret = Session.query(exists().where(and_(Someobject.field1 == value1, Someobject.field2 == value2)))
-        return self.session.query(exists().where(model.id == id)).one()[0]
+        objectExists = self.session.query(exists().where(model.id == id)).one()[0]
+        self.session.commit()
+        return objectExists
 
-    def findByKey(self,key,model):
-        return self.session.query(model).filter(model.key == key).first()
+    def findByKeyAndCommit(self,key,model):
+        object = self.session.query(model).filter(model.key == key).first()
+        self.session.commit()
+        return object
 
-    def existsByKey(self,key,model):
-        return self.session.query(exists().where(model.key == key)).one()[0]
+    def existsByKeyAndCommit(self,key,model):
+        objectExists = self.session.query(exists().where(model.key == key)).one()[0]
+        self.session.commit()
+        return objectExists
 
-    def findByStatus(self,status,model):
-        return self.session.query(model).filter(model.status == status).first()
+    def findByStatusAndCommit(self,status,model):
+        object = self.session.query(model).filter(model.status == status).first()
+        self.session.commit()
+        return object
 
-    def findAllByQuery(self,query,model):
+    def findAllByQueryAndCommit(self,query,model):
         if query :
-            return self.session.query(model).filter_by(**query).all()
+            objectList = self.session.query(model).filter_by(**query).all()
+            self.session.commit()
+            return objectList
         return []

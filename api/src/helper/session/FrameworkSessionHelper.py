@@ -3,9 +3,9 @@ FrameworkStatus = FrameworkConstant.Status
 
 def activateSession(self,session):
     session.status = FrameworkStatus[FrameworkConstant.ACTIVE]
-    self.session = self.repository.save(session)
+    self.session = self.repository.saveAndCommit(session)
 
 def deactivateSessionList(self,sessionList):
     for session in sessionList :
         session.status = FrameworkStatus[FrameworkConstant.INACTIVE]
-    self.repository.saveAll(sessionList)
+    self.repository.saveAllAndCommit(sessionList)

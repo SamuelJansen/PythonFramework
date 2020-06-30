@@ -4,6 +4,7 @@ def pythonFrameworkDefaultRun(commandList,globals,**kwargs):
 from service.framework.globals import Globals
 globals = Globals.Globals(
     debugStatus = True,
+    warningStatus = True,
     errorStatus = True,
     successStatus = True,
     failureStatus = True,

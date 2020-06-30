@@ -124,6 +124,7 @@ class Globals:
     def __init__(self,
         encoding = ENCODING,
         debugStatus = False,
+        warningStatus = False,
         errorStatus = False,
         successStatus = False,
         failureStatus = False,
@@ -592,9 +593,13 @@ class Globals:
                 self.debug(f'''{Globals.TAB}key : value --> {settingKey} : {settingValue}''')
                 return settingValue
 
-    def debug(self,string):
+    def debug(self,message):
         if self.debugStatus :
-            print(f'{Globals.DEBUG}{string}')
+            print(f'{Globals.DEBUG}{message}')
+
+    def warning(self,string):
+        if self.warningStatus :
+            print(f'{Globals.WARNING}{string}')
 
     def error(self,classRequest,message,exception):
         if self.errorStatus :
