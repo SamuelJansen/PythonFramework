@@ -21,24 +21,27 @@ def runTestCase(swagger,tagSet,testCaseKey,testCaseValues) :
     expectedResponse = swagger.getFilteredSetting(integration.EXPECTED_RESPONSE,testCaseValues)
     ignoreKeyList = getIgnoreKeyList(swagger,testCaseValues)
     response = swagger.runTest(url,tag,method,verb,authorizaton,processingTime,payload,expectedResponse)
-    filteredExpectedResponseAsDict = ObjectHelper.filterIgnoreKeyList(json.loads(expectedResponse),ignoreKeyList)
-    filteredResponseAsDict = ObjectHelper.filterIgnoreKeyList(json.loads(response),ignoreKeyList)
+    filteredExpectedResponseAsDict = ObjectHelper.filterIgnoreKeyList(getObjectAsJson(swagger,expectedResponse),ignoreKeyList)
+    filteredResponseAsDict = ObjectHelper.filterIgnoreKeyList(getObjectAsJson(swagger,response),ignoreKeyList)
     success = ObjectHelper.equal(filteredResponseAsDict,filteredExpectedResponseAsDict)
     print(f'''
-        {testCaseKey}''',end='')
+        {testCaseKey}''')
     if success :
         print(f'''
-            {integration.SUCCESS_MESSAGE}''')
+        {integration.SUCCESS_MESSAGE}''')
     else :
-        print(f'''
-            {integration.URL} = {url}
-            {integration.TAG} = {tag}
-            {integration.METHOD} = {method}
-            {integration.VERB} = {verb}
-            {integration.PROCESSING_TIME} = {processingTime}
-            {integration.PAYLOAD} = {payload}
-            {integration.EXPECTED_RESPONSE} = {expectedResponse}
-            {integration.RESPONSE} = {response}''')
+        logContent = f'''
+        TEST FAIL :
+        {integration.URL} = {url}
+        {integration.TAG} = {tag}
+        {integration.METHOD} = {method}
+        {integration.VERB} = {verb}
+        {integration.PROCESSING_TIME} = {processingTime}
+        {integration.PAYLOAD} = {payload}
+        {integration.EXPECTED_RESPONSE} = {expectedResponse}
+        {integration.RESPONSE} = {response}'''
+        print(logContent)
+        persistLog(swagger,testCaseKey,logContent)
 
 def getUrl(swagger,testCaseValues) :
     url = swagger.getFilteredSetting(integration.URL,testCaseValues)
@@ -63,3 +66,15 @@ def getIgnoreKeyList(swagger,testCaseValues) :
     if ignoreKeyList :
         return ignoreKeyList
     return []
+
+def getObjectAsJson(swagger,objectAsString) :
+    try :
+        return json.loads(objectAsString)
+    except Exception as exception :
+        swagger.globals.error(swagger.__class__,'error in Json converion',exception)
+
+def persistLog(swagger,testCaseKey,logContent) :
+    try :
+        return swagger.repository(testCaseKey,logContent)
+    except Exception as exception :
+        swagger.globals.error(swagger.__class__,f'''couldn't persist {testCaseKey} log content''',exception)
