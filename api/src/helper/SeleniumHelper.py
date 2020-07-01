@@ -10,6 +10,8 @@ import time, os
 class SeleniumHelper:
 
     TAG_BODY = 'body'
+    TAG_SELECT = 'select'
+    TAG_OPTION = 'option'
     TAG_HEADER = 'header'
     TAG_BUTTON = 'button'
     TAG_IMPUT = 'input'
@@ -28,7 +30,7 @@ class SeleniumHelper:
         self.pyperclip = pyperclip
         self.waittingTime = waittingTime
         self.fractionOfWaittingTime = waittingTime / 7.0
-
+        self.driverPath = f'{self.globals.apiPath}api{self.globals.OS_SEPARATOR}resource{self.globals.OS_SEPARATOR}dependency{self.globals.OS_SEPARATOR}chromedriver.exe'
         self.aKey = 'a'
         self.closeBraceKey = '}'
 
@@ -38,7 +40,11 @@ class SeleniumHelper:
         except Exception as exception :
             self.globals.debug(f'{self.globals.ERROR}Failed to close driver. Cause: {str(exception)}')
         try :
-            self.driver = webdriver.Chrome(ChromeDriverManager().install()) ### webdriver.Chrome(executable_path=self.driverPath)
+            try :
+                self.driver = webdriver.Chrome(ChromeDriverManager().install()) ### webdriver.Chrome(executable_path=self.driverPath)
+            except Exception as exception :
+                self.globals.debug(f'Failed to load web driver from default library. Going for a second attempt by another library. Cause: {str(exception)}')
+                self.driver = webdriver.Chrome(executable_path=self.driverPath)
             self.wait()
             return self.driver.find_element_by_tag_name(self.TAG_BODY)
         except Exception as exception :
@@ -168,6 +174,16 @@ class SeleniumHelper:
         except Exception as exception :
             self.globals.debug(f'Failed to access class. Cause: {str(exception)}')
 
+    def accessTag(self,tagName,elementRequest):
+        try :
+            driver = self.getDriver(elementRequest)
+            element = driver.find_element_by_tag_name(tagName)
+            element = element.click()
+            self.wait(fraction=True)
+            return element
+        except Exception as exception :
+            self.globals.debug(f'Failed to access tag. Cause: {str(exception)}')
+
     def getTextByClass(self,cssClass,elementRequest):
         try :
             driver = self.getDriver(elementRequest)
@@ -175,6 +191,14 @@ class SeleniumHelper:
             return element.text
         except Exception as exception :
             self.globals.debug(f'Failed to get text by class. Cause: {str(exception)}')
+
+    def getTextBySelector(self,selector,elementRequest):
+        try :
+            driver = self.getDriver(elementRequest)
+            element = driver.find_element_by_xpath(selector)
+            return element.text
+        except Exception as exception :
+            self.globals.debug(f'Failed to get text by selector. Cause: {str(exception)}')
 
     def findButtonByClass(self,cssClass,elementRequest):
         try :
@@ -304,12 +328,25 @@ class SeleniumHelper:
         except Exception as exception :
             self.globals.debug(f'Failed to find all by class. Cause: {str(exception)}')
 
+    def findAllByTag(self,tagName,elementRequest):
+        try :
+            driver = self.getDriver(elementRequest)
+            return driver.find_elements_by_tag_name(tagName)
+        except Exception as exception :
+            self.globals.debug(f'Failed to find all by tag. Cause: {str(exception)}')
+
     def findAllBySelector(self,selector,elementRequest):
         try :
             driver = self.getDriver(elementRequest)
             return driver.find_elements_by_xpath(selector)
         except Exception as exception :
             self.globals.debug(f'Failed to find all by class. Cause: {str(exception)}')
+
+    def clickElement(self,elementRequest):
+        try :
+            elementRequest.click()
+        except Exception as exception :
+            self.globals.debug(f'Failed to click element {str(element)}. Cause: {str(exception)}')
 
     def calculateAndClick(self,position,fatherSize):
         try :
