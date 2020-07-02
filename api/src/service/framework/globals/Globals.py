@@ -136,6 +136,7 @@ class Globals:
 
         self.globalsName = self.__class__.__name__
         self.debugStatus = debugStatus
+        self.warningStatus = warningStatus
         self.errorStatus = errorStatus
         self.successStatus = successStatus
         self.failureStatus = failureStatus
