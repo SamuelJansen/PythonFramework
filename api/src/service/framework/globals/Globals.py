@@ -89,6 +89,7 @@ class Globals:
 
     NODE_IGNORE_LIST = [
         '.git',
+        'distribution',
         '__pycache__',
         '__init__',
         '__main__',
