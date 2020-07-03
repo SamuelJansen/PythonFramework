@@ -3,6 +3,7 @@ def pythonFrameworkDefaultRun(commandList,globals,**kwargs):
 
 from service.framework.globals import Globals
 globals = Globals.Globals(
+    file = __file__,
     debugStatus = True,
     warningStatus = True,
     errorStatus = True,

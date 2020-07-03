@@ -13,7 +13,7 @@ Globals:
         dependency:
             update: False
             list:
-                web: [Popen,Path,pygame,numpy,pywin32,SpeechRecognition,PyTTSx,webdriver_manager,selenium,sqlalchemy,pyautogui,wit,psycopg2] ###- pyaudio,python-Levenshtein
+                web: [Popen,Path,pygame,numpy,pywin32,SpeechRecognition,PyTTSx,webdriver_manager,selenium,sqlalchemy,pyautogui,wit,psycopg2,twine] ###- pyaudio,python-Levenshtein
                 local: [PyAudio-0.2.11-cp38-cp38-win32.whl,python_Levenshtein-0.12.0-cp38-cp38-win32.whl]
         list: [PythonFramework] ###- [PythonFramework]
         language: EN-US ###- PT-BR ###-
@@ -34,3 +34,5 @@ Globals:
                 64: pip install PyAudio-0.2.11-cp38-cp38-win_amd64.whl ###- example
                 32: PyAudio-0.2.11-cp38-cp38-win32.whl ###- example
         link: https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio ###- library
+    distribution:
+        command-list: ['python setup.py sdist', twine upload dist/*'

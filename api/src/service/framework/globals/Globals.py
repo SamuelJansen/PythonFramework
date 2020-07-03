@@ -89,6 +89,7 @@ class Globals:
 
     NODE_IGNORE_LIST = [
         '.git',
+        'distribution',
         '__pycache__',
         '__init__',
         '__main__',
@@ -122,6 +123,7 @@ class Globals:
     SETTING =   '[SETTING] '
 
     def __init__(self,
+        file = None,
         encoding = ENCODING,
         debugStatus = False,
         warningStatus = False,
@@ -130,6 +132,8 @@ class Globals:
         failureStatus = False,
         settingStatus = False,
     ):
+
+        print(file)
 
         clear = lambda: os.system('cls')
         ###- clear() # or simply os.system('cls')
