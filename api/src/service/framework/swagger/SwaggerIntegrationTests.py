@@ -1,4 +1,5 @@
 import SeleniumHelper, SwaggerTestRunner, SettingHelper
+print("==============================================================================================================================")
 
 INTEGRATION_FOLDER = 'integration'
 
@@ -15,10 +16,13 @@ METHOD = 'method'
 VERB = 'verb'
 AUTHORIZATION = KW_AUTHORIZATION
 PROCESSING_TIME = 'processingTime'
+PATH_VARIABLE_SET = 'pathVariableSet'
 PAYLOAD = 'payload'
 EXPECTED_RESPONSE = 'expectedResponse'
 RESPONSE = 'response'
 IGNORE_KEY_VALUE_LIST = 'ignore-key-value-list'
+
+VERB_GET = 'GET'
 
 SUCCESS_MESSAGE = 'Success'
 
@@ -35,20 +39,21 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
     def runTestSet(self,testSet):
         SwaggerTestRunner.runTestSet(self,testSet)
 
-    def runTest(self,url,tag,method,verb,authorization,processingTime,payload,expectedResponse) :
-        self.resetValues(url,tag,method,verb,authorization,processingTime,payload,expectedResponse)
+    def runTest(self,url,tag,method,verb,authorization,processingTime,pathVariableSet,payload,expectedResponse) :
+        self.resetValues(url,tag,method,verb,authorization,processingTime,pathVariableSet,payload,expectedResponse)
         swaggerUrl = self.accessSwaggerUrl()
         swaggerTag = self.accessSwaggerTag(swaggerUrl)
         swaggerMethod = self.accessSwaggerMethod(swaggerTag)
         self.hitTryOut(swaggerMethod)
         self.typeAuthorizaton(swaggerMethod)
-        self.typePayload(swaggerMethod)
+        self.hitPathVariableSet(swaggerMethod)
+        self.typePayload(verb,swaggerMethod)
         self.hitExecute(swaggerMethod)
         self.waitProcessingTime()
         response = self.getResponse(swaggerMethod)
         return response
 
-    def resetValues(self,url,tag,method,verb,authorization,processingTime,payload,expectedResponse):
+    def resetValues(self,url,tag,method,verb,authorization,processingTime,pathVariableSet,payload,expectedResponse):
         globals = self.globals
         self.url = url
         self.tag = tag
@@ -56,6 +61,7 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
         self.verb = verb
         self.authorization = authorization
         self.processingTime = processingTime
+        self.pathVariableSet = pathVariableSet
         self.payload = payload
         self.expectedResponse = expectedResponse
         self.findByIdRequest = f'{SwaggerKeyWord.OPERATION_TAG_DASH}{self.tag.replace(globals.SPACE,globals.UNDERSCORE)}'
@@ -76,14 +82,34 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
     def typeAuthorizaton(self,swaggerMethod):
         self.typeInSwagger(self.authorization,self.findBySelector(SwaggerKeyWord.SELECTOR_AUTHORIZATION,swaggerMethod))
 
-    def typePayload(self,swaggerMethod):
-        self.typeInSwagger(self.payload,self.findByClass(SwaggerKeyWord.BODY_PARAM,swaggerMethod))
+    def hitPathVariableSet(self,swaggerMethod):
+        if self.pathVariableSet :
+            for pathParamKey,pathParamValue in self.pathVariableSet.items() :
+                self.hitPathVariable(pathParamKey,pathParamValue,swaggerMethod)
+
+    def hitPathVariable(self,pathParamKey,pathParamValue,swaggerMethod):
+        htmlParamList = self.findAllBySelector(SwaggerKeyWord.SELECTOR_TBODY,swaggerMethod)
+        for htmlParam in htmlParamList :
+            if self.findByClass(SwaggerKeyWord.MARKDOWN,htmlParam).text == pathParamKey :
+                self.accessTag(self.TAG_SELECT,htmlParam)
+                optionList = self.findAllByTag(self.TAG_OPTION,htmlParam)
+                for option in optionList :
+                    if option.text == pathParamValue :
+                        self.clickElement(option)
+
+    def typePayload(self,verb,swaggerMethod):
+        if self.payload :
+            if not VERB_GET == verb :
+                self.typeInSwagger(self.payload,self.findByClass(SwaggerKeyWord.BODY_PARAM,swaggerMethod))
+            else :
+                self.globals.error(self.__class__,"GET method do not support payload.",None)
 
     def hitExecute(self,swaggerMethod):
         self.accessButton(self.findByClass(SwaggerKeyWord.EXECUTE_WRAPPER,swaggerMethod))
 
     def getResponse(self,swaggerMethod):
-        return self.getTextByClass(SwaggerKeyWord.MICROLIGHT,self.findByClass(SwaggerKeyWord.HIGHLIGHT_CODE,swaggerMethod))
+
+        return self.getTextBySelector(SwaggerKeyWord.SELECTOR_RESPONSE,swaggerMethod)
 
     def waitProcessingTime(self):
         self.wait(processingTime=self.processingTime)
@@ -103,7 +129,9 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
 
 class SwaggerKeyWord:
 
+    SELECTOR_TBODY = '//div//div//table//tbody//tr//td[@class="col parameters-col_description"]'
     SELECTOR_AUTHORIZATION = '//tbody//tr//td//input[@placeholder="Authorization - Access Token"]'
+    SELECTOR_RESPONSE = '//tbody//tr//td//div//div//pre[@class=" microlight"]'
 
     EXPAND_OPERATION = 'expand-operation'
     TRY_OUT = 'try-out'
@@ -111,6 +139,7 @@ class SwaggerKeyWord:
     EXECUTE_WRAPPER = 'execute-wrapper'
     HIGHLIGHT_CODE = 'highlight-code'
     MICROLIGHT = 'microlight'
+    MARKDOWN = "markdown"
 
     ###- this seccion is used only as part of the full swagger html class or ir or whatever
     OPERATIONS_DASH = 'operations-'

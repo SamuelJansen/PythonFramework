@@ -127,9 +127,9 @@ class GitCommitter:
     def cloneProjectIfNeeded(self,commandList):
         globals = self.globals
         projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',commandList)
-        projectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
+        localProjectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
         commandListTree = {}
-        if not projectNameList or projectName not in projectNameList :
+        if not localProjectNameList or projectName not in localProjectNameList :
             projectUrl = f'{self.gitUrl}{projectName}.{self.gitExtension}'
             command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,projectUrl)
             processPath = f'{globals.localPath}{globals.apisRoot}'
@@ -155,17 +155,23 @@ class GitCommitter:
 
     def cloneAllIfNeeded(self,commandList):
         globals = self.globals
-        projectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
-        if projectNameList :
+        localProjectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
+        if localProjectNameList :
             commandListTree = {}
-            for projectName in self.apiNameList :
-                if projectName not in projectNameList :
-                    projectUrl = f'{self.gitUrl}{projectName}.{self.gitExtension}'
-                    command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,projectUrl)
+            for api in self.session.api_list :
+            # for projectName in self.apiNameList :
+                if api.class_name not in localProjectNameList :
+                # if projectName not in localProjectNameList :
+                    # projectUrl = api.git_url
+                    # projectUrl = f'{self.gitUrl}{projectName}.{self.gitExtension}'
+                    command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,api.git_url)
+                    # command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,projectUrl)
                     processPath = f'{globals.localPath}{globals.apisRoot}'
-                    commandListTree[projectName] = [command]
+                    commandListTree[api.class_name] = [command]
+                    # commandListTree[projectName] = [command]
                 else :
-                    print(f'{projectName} already exists')
+                    globals.warning(f'{api.class_name} already exists')
+                    # print(f'{projectName} already exists')
 
             if commandListTree :
                 returnSet = self.runCommandListTree(commandListTree,path=processPath)

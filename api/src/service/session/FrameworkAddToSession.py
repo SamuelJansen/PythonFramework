@@ -38,7 +38,7 @@ def getCredentials(self,commandList) :
         sessionKey = commandList[self._0_ARGUMENT]
         apiKey = commandList[self._1_ARGUMENT]
         apiClassName = commandList[self._2_ARGUMENT]
-        if len(commandList[self._3_ARGUMENT:]) > self._3_ARGUMENT :
+        if len(commandList[self._3_ARGUMENT:]) >= 1 :
             gitUrl = commandList[self._3_ARGUMENT]
         else :
             gitUrl = f'''{self.gitCommitter.gitUrl}{apiClassName}.{self.gitCommitter.gitExtension}'''

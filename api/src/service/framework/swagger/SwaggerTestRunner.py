@@ -11,37 +11,42 @@ def runTestSet(swagger,testSet) :
                 runTestCase(swagger,tagSet,testCaseKey,testCaseValues)
 
 def runTestCase(swagger,tagSet,testCaseKey,testCaseValues) :
+    swagger.newDriver()
     url = getUrl(swagger,testCaseValues)
     tag = getTag(swagger,testCaseValues,tagSet)
     method = swagger.getFilteredSetting(integration.METHOD,testCaseValues)
     verb = swagger.getFilteredSetting(integration.VERB,testCaseValues)
     authorizaton = getAuthoization(swagger,testCaseValues)
     processingTime = swagger.getFilteredSetting(integration.PROCESSING_TIME,testCaseValues)
+    pathVariableSet = swagger.getFilteredSetting(integration.PATH_VARIABLE_SET,testCaseValues)
     payload = swagger.getFilteredSetting(integration.PAYLOAD,testCaseValues)
     expectedResponse = swagger.getFilteredSetting(integration.EXPECTED_RESPONSE,testCaseValues)
     ignoreKeyList = getIgnoreKeyList(swagger,testCaseValues)
-    response = swagger.runTest(url,tag,method,verb,authorizaton,processingTime,payload,expectedResponse)
+    response = swagger.runTest(url,tag,method,verb,authorizaton,processingTime,pathVariableSet,payload,expectedResponse)
+    swagger.closeDriver()
+
     filteredExpectedResponseAsDict = ObjectHelper.filterIgnoreKeyList(getObjectAsJson(swagger,expectedResponse),ignoreKeyList)
     filteredResponseAsDict = ObjectHelper.filterIgnoreKeyList(getObjectAsJson(swagger,response),ignoreKeyList)
     success = ObjectHelper.equal(filteredResponseAsDict,filteredExpectedResponseAsDict)
     print(f'''
-        {testCaseKey}''')
+        {testCaseKey}
+        ''')
     if success :
-        print(f'''
-        {integration.SUCCESS_MESSAGE}''')
-    else :
         logContent = f'''
-        TEST FAIL :
-        {integration.URL} = {url}
-        {integration.TAG} = {tag}
-        {integration.METHOD} = {method}
-        {integration.VERB} = {verb}
-        {integration.PROCESSING_TIME} = {processingTime}
-        {integration.PAYLOAD} = {payload}
-        {integration.EXPECTED_RESPONSE} = {expectedResponse}
-        {integration.RESPONSE} = {response}'''
-        print(logContent)
-        persistLog(swagger,testCaseKey,logContent)
+        {integration.SUCCESS_MESSAGE}'''
+    else :
+        logContent = f'''Test-failed :
+        {integration.URL} ==> {url}
+        {integration.TAG} ==> {tag}
+        {integration.METHOD} ==> {method}
+        {integration.VERB} ==> {verb}
+        {integration.PROCESSING_TIME} ==> {processingTime}
+        {integration.PATH_VARIABLE_SET} ==> {pathVariableSet}
+        {integration.PAYLOAD} ==> {payload}
+        {integration.EXPECTED_RESPONSE} ==> {expectedResponse}
+        {integration.RESPONSE} ==> {response}'''
+    print(logContent + '\n\n')
+    return persistLog(swagger,testCaseKey,logContent)
 
 def getUrl(swagger,testCaseValues) :
     url = swagger.getFilteredSetting(integration.URL,testCaseValues)
@@ -75,6 +80,7 @@ def getObjectAsJson(swagger,objectAsString) :
 
 def persistLog(swagger,testCaseKey,logContent) :
     try :
-        return swagger.repository(testCaseKey,logContent)
+        if 'Test-failed' in logContent :
+            return swagger.repository(testCaseKey,logContent)
     except Exception as exception :
         swagger.globals.error(swagger.__class__,f'''couldn't persist {testCaseKey} log content''',exception)

@@ -1,5 +1,5 @@
 Globals:
-    print-status: False
+    print-status: True
     api:
         name: framework
         repository :
