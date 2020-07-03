@@ -1,4 +1,0 @@
-globals:
-    version-list: '''[
-        'v0.0.1 https://pypi.org/project/globals/0.0.10/',
-    ]'''
