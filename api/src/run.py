@@ -4,7 +4,7 @@ def pythonFrameworkDefaultRun(commandList,globals,**kwargs):
 try :
     from globals import Globals
     globals = Globals(
-        file = __file__,
+        filePath = __file__,
         debugStatus = True,
         warningStatus = True,
         errorStatus = True,
