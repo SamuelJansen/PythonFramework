@@ -1,10 +1,11 @@
-from api.src.service.framework.globals import Globals
-globals = Globals.Globals(
-    debugStatus = True,
-    errorStatus = True,
+from globals import Globals
+globals = Globals(__file__,
     successStatus = True,
+    settingStatus = True,
+    debugStatus = True,
+    warningStatus = True,
     failureStatus = True,
-    settingStatus = True
+    errorStatus = True
 )
 
 import PythonFrameworkFlask

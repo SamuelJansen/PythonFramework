@@ -1,8 +1,5 @@
-def pythonFrameworkDefaultRun(commandList,globals,**kwargs):
-    globals.debug(f'"pythonFrameworkDefaultRun()" method not implemented')
-
-from service.framework.globals import Globals
-globals = Globals.Globals(
+from globals import Globals
+globals = Globals(__file__,
     debugStatus = True,
     warningStatus = True,
     errorStatus = True,
@@ -10,6 +7,9 @@ globals = Globals.Globals(
     failureStatus = True,
     settingStatus = True
 )
+
+def pythonFrameworkDefaultRun(commandList,globals,**kwargs):
+    globals.debug(f'"pythonFrameworkDefaultRun()" method not implemented')
 
 if __name__ == '__main__' :
     import PythonFramework
