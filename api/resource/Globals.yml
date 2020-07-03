@@ -3,12 +3,12 @@ Globals:
     api:
         name: framework
         repository :
-            # dialect: postgres
-            # user: jbqafgvnjszmoh
-            # password: 9a4b08000c04c22cd6f533c5ac76098102aecdb646e9bc2fb3d9a74089fcebc9
-            # host: ec2-35-173-94-156.compute-1.amazonaws.com
-            # port: 5432
-            # database: d5h5kfi694bmst
+            dialect: postgres
+            user: jbqafgvnjszmoh
+            password: 9a4b08000c04c22cd6f533c5ac76098102aecdb646e9bc2fb3d9a74089fcebc9
+            host: ec2-35-173-94-156.compute-1.amazonaws.com
+            port: 5432
+            database: d5h5kfi694bmst
         extension: yml
         dependency:
             update: False

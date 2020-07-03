@@ -1,4 +1,5 @@
 import SeleniumHelper, SwaggerTestRunner, SettingHelper
+print("==============================================================================================================================")
 
 INTEGRATION_FOLDER = 'integration'
 
@@ -82,8 +83,9 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
         self.typeInSwagger(self.authorization,self.findBySelector(SwaggerKeyWord.SELECTOR_AUTHORIZATION,swaggerMethod))
 
     def hitPathVariableSet(self,swaggerMethod):
-        for pathParamKey,pathParamValue in self.pathVariableSet.items() :
-            self.hitPathVariable(pathParamKey,pathParamValue,swaggerMethod)
+        if self.pathVariableSet :
+            for pathParamKey,pathParamValue in self.pathVariableSet.items() :
+                self.hitPathVariable(pathParamKey,pathParamValue,swaggerMethod)
 
     def hitPathVariable(self,pathParamKey,pathParamValue,swaggerMethod):
         htmlParamList = self.findAllBySelector(SwaggerKeyWord.SELECTOR_TBODY,swaggerMethod)
@@ -97,8 +99,10 @@ class SwaggerIntegrationTests(SeleniumHelper.SeleniumHelper):
 
     def typePayload(self,verb,swaggerMethod):
         if self.payload :
-            # if not VERB_GET == verb :
-            self.typeInSwagger(self.payload,self.findByClass(SwaggerKeyWord.BODY_PARAM,swaggerMethod))
+            if not VERB_GET == verb :
+                self.typeInSwagger(self.payload,self.findByClass(SwaggerKeyWord.BODY_PARAM,swaggerMethod))
+            else :
+                self.globals.error(self.__class__,"GET method do not support payload.",None)
 
     def hitExecute(self,swaggerMethod):
         self.accessButton(self.findByClass(SwaggerKeyWord.EXECUTE_WRAPPER,swaggerMethod))
