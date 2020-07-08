@@ -1,8 +1,8 @@
 from flask_restful import Resource
-from globals import Globals
+import globals
 import UrlResource
 
-@Globals.Resource(path = UrlResource.GLOBALS)
+@globals.Resource(path = UrlResource.GLOBALS)
 class GlobalsResource(Resource):
 
     def get(self):
