@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import Api
-import ResourceService, HomeResource, Globals
+from globals import Globals
+import ResourceService, HomeResource
 
 application = Flask(__name__)
 api = Api(application)

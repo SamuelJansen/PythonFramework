@@ -1,5 +1,6 @@
 from flask_restful import Resource
-import Globals, UrlResource
+from globals import Globals
+import UrlResource
 
 @Globals.Resource(path = UrlResource.GLOBALS)
 class GlobalsResource(Resource):
