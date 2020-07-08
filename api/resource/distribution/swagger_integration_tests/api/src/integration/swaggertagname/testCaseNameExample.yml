@@ -1,0 +1,49 @@
+testCase: ### this is a keyWord. cannot be changed
+    firstDoThis:
+        url : 'a/different/url/can/be/set/here'
+        tag : 'ADifferenteTagCanBeSetHere'
+        method : 'onceInsideTheagItsSwaggerMethod'
+        verb : 'POST'
+        processingTime : 1
+        payload : '''{
+            "innerObject": {
+                "attribure_1": "value_1",
+                "attribure_1": "value_2",
+                "attribure_1": "value_3",
+            },
+            "attribure_4": "value_4",
+            "attribure_5": number
+        }'''
+        expectedResponse : '''{
+            "innerObject": {
+                "some": "value_1",
+                "expected": "value_2",
+                "response": "value_3",
+            },
+            "comes": "value_4",
+            "here": number
+        }'''
+    thenDoThis:
+        url : 'a/different/url/can/be/set/here'
+        tag : 'ADifferenteTagCanBeSetHere'
+        method : 'onceInsideTheagItsSwaggerMethod'
+        verb : 'POST'
+        processingTime : 1
+        payload : '''{
+            "innerObject": {
+                "attribure_1": "value_1",
+                "attribure_1": "value_2",
+                "attribure_1": "value_3",
+            },
+            "attribure_4": "value_4",
+            "attribure_5": number
+        }'''
+        expectedResponse : '''{
+            "innerObject": {
+                "some": "value_1",
+                "expected": "value_2",
+                "response": "value_3",
+            },
+            "comes": "value_4",
+            "here": number
+        }'''

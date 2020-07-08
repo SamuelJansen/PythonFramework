@@ -1,5 +1,6 @@
 import json
-import SwaggerIntegrationTests, ObjectHelper
+from swagger_integration_tests.api.src.service import SwaggerIntegrationTests
+from python_helper import ObjectHelper
 
 integration = SwaggerIntegrationTests
 

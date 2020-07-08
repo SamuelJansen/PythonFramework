@@ -1,4 +1,5 @@
-import SeleniumHelper, SqlAlchemyHelper
+import SqlAlchemyHelper
+from python_selenium_helper import SeleniumHelper
 
 FILE_FOLDER_LOCAL_PATH = 'repository\\file\\'
 

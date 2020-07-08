@@ -1,7 +1,7 @@
 from SqlAlchemyHelper import *
 from PythonFrameworkTable import *
 from Session import *
-import Constant
+from python_helper import Constant
 
 class Api(Model):
     __tablename__ = API

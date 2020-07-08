@@ -1,5 +1,5 @@
-import StringHelper
-import Constant as c
+from python_helper.api.src.domain import Constant
+from python_helper.api.src.service import StringHelper
 
 def equal(responseAsDict,expectedResponseAsDict) :
     filteredResponse = StringHelper.filterJson(str(responseAsDict))
@@ -11,7 +11,7 @@ def filterIgnoreKeyList(objectAsDictionary,ignoreKeyList):
         filteredObjectAsDict = {}
         for key in sorted(objectAsDictionary):
             if key not in ignoreKeyList :
-                if objectAsDictionary[key].__class__.__name__ == 'dict' :
+                if objectAsDictionary[key].__class__.__name__ == Constant.DICT :
                     objectAsDictionary[key] = filterIgnoreKeyList(objectAsDictionary[key],ignoreKeyList)
                 filteredObjectAsDict[key] = objectAsDictionary[key]
         return filteredObjectAsDict

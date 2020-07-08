@@ -1,4 +1,4 @@
-import Constant
+from python_helper import Constant
 import Api, Session, FrameworkConstant, DataLoad
 from PythonFrameworkApplicationScript import ADD_APPLICATION_FILE_SCRIPT, APPLICATION_TOKEN
 

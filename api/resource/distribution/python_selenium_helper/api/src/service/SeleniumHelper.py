@@ -358,26 +358,9 @@ class SeleniumHelper:
             windowInnerHeight = self.driver.execute_script("return window.innerHeight")
             windowScrollX = self.driver.execute_script("return window.scrollX")
             windowScrollY = self.driver.execute_script("return window.scrollY")
-            # print(f'[windowX,windowY] = {[windowX,windowY]}')
-            # print(f'[windowOuterWidth,windowOuterHeight] = {[windowOuterWidth,windowOuterHeight]}')
-            # print(f'[windowInnerWidth,windowInnerHeight] = {[windowInnerWidth,windowInnerHeight]}')
-            # print(f'[windowScrollX,windowScrollY] = {[windowScrollX,windowScrollY]}')
-
             bottonWidth = (windowOuterWidth - windowInnerWidth) / 2
             position[0] += int(windowX + (windowInnerWidth - fatherSize[0]) / 2 - bottonWidth)
             position[1] += int(windowY + (windowOuterHeight - windowInnerHeight - bottonWidth) + (windowInnerHeight - fatherSize[1]) / 2 + 1.5 * bottonWidth)
-
-            # self.pyautogui.moveTo(position[0],position[1])
-            # print(f'click({position})')
-            # incorrect = True
-            # while incorrect :
-            #     newPosition = input('type new position "x y": ')
-            #     if not newPosition.strip() == '0 0' :
-            #         position = [int(newPosition.split()[0]), int(newPosition.split()[1])]
-            #         self.pyautogui.moveTo(position[0],position[1])
-            #         print(f'click({position})')
-            #     else :
-            #         incorrect = False
             self.pyautogui.moveTo(position[0],position[1])
             self.pyautogui.click()
             return position

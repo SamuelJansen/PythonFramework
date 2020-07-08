@@ -1,4 +1,5 @@
-import Constant
+from python_helper import Constant
+from python_helper import log
 
 def SessionMethod(sessionMethod,*args,**kwargs) :
     def wraperMethod(*args,**kwargs) :
@@ -17,5 +18,5 @@ def SessionMethod(sessionMethod,*args,**kwargs) :
                     methodName = f' {methodName}'
             except :
                 methodName = ''
-            print(f'''{Constant.WRAPPER}{SessionMethod.__name__} failed to execute{className}{methodName} method. Cause: {str(exception)}''')
+            log.wraper(SessionMethod,f'''failed to execute{className}{methodName} method''',exception)
     return wraperMethod

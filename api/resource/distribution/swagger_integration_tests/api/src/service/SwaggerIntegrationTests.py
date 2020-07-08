@@ -1,5 +1,6 @@
-import SeleniumHelper, SwaggerTestRunner, SettingHelper
-print("==============================================================================================================================")
+from swagger_integration_tests.api.src.service import SwaggerTestRunner
+from python_selenium_helper import SeleniumHelper
+from python_helper import SettingHelper
 
 INTEGRATION_FOLDER = 'integration'
 
