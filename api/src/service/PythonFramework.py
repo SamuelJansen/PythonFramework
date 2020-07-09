@@ -196,6 +196,9 @@ class PythonFramework:
     def printError(self,message):
         self.printMessage(message,Constant.ERROR)
 
+    def printWarning(self,message):
+        self.printMessage(message,Constant.WARNING)
+
     def printMessage(self,message,level):
         print(f'{Constant.TAB}{level}{message}')
 

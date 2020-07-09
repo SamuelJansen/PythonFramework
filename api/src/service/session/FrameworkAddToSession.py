@@ -2,6 +2,7 @@ from PythonFrameworkApplicationScript import ADD_APPLICATION_FILE_SCRIPT, APPLIC
 import Api, Session
 Api = Api.Api
 Session = Session.Session
+from python_helper import log
 
 import FrameworkConstant
 FrameworkStatus = FrameworkConstant.Status
@@ -20,7 +21,7 @@ def addToSession(self,commandList):
                     self.repository.saveAllAndCommit(session.api_list)
                     self.printSuccess(f'"{api.key}" : "{api.class_name}" added successfully')
                 else :
-                    globals.warning(f'"{api.key}" : "{api.class_name}" api already belongs to "{session.key}" session')
+                    self.printWarning(f'"{api.key}" : "{api.class_name}" api already belongs to "{session.key}" session')
             else :
                 newApi = Api(apiKey,apiClassName,gitUrl,importApplicationScript,[session])
                 newApi = self.repository.saveAndCommit(newApi)
@@ -30,7 +31,7 @@ def addToSession(self,commandList):
             errorMessage = str(exception)
     else :
         errorMessage = 'failed to parse parameters'
-    globals.error(self.__class__, f'failed to add api due {commandList} command list', errorMessage)
+    log.error(self.__class__, f'failed to add api due {commandList} command list', errorMessage)
 
 def getCredentials(self,commandList) :
     apiKey = apiClassName = gitUrl = None
