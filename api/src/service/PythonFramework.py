@@ -7,6 +7,7 @@ from SessionMethodAnnotation import SessionMethod
 from PythonFrameworkApplicationScript import *
 import FrameworkNewSession, FrameworkOpenSession, FrameworkPrintSession, FrameworkLoadApiClassSet, FrameworkCloseSession, FrameworkAddToSession
 import FrameworkSessionHelper
+from python_helper import log, Constant
 
 Api = Api.Api
 Session = Session.Session
@@ -29,8 +30,6 @@ class PythonFramework:
     _2_ARGUMENT = 4
     _3_ARGUMENT = 5
 
-    COMMAND_ADD_API_BY_KEY_VALUE = 'add-api-by-key-value'
-
     COMMAND_NEW_SESSION = 'new-session'
     COMMAND_OPEN_SESSION = 'open-session'
     COMMAND_ADD_TO_SESSION = 'add-to-session'
@@ -46,7 +45,6 @@ class PythonFramework:
 
     COMMAND_COMMAND_LIST = 'command-list'
     commandList = {
-        COMMAND_ADD_API_BY_KEY_VALUE : [],
         COMMAND_NEW_SESSION : [],
         COMMAND_OPEN_SESSION : [],
         COMMAND_ADD_TO_SESSION : ['sessionKey','apiKey','apiClassName','gitUrl'],
@@ -65,8 +63,8 @@ class PythonFramework:
     @SessionMethod
     def handleCommandList(self,commandList):
         globals = self.globals
-        globals.debug(f'{self.__class__.__name__}.commandList = {commandList}')
-        globals.debug(f'session = {self.session}')
+        log.debug(self.__class__,f'{self.__class__.__name__}.commandList = {commandList}')
+        log.debug(self.__class__,f'session = {self.session}')
         return self.apiSet[commandList[self._0_API_KEY]][commandList[self._1_COMMAND]](commandList)
 
     @SessionMethod
@@ -76,17 +74,17 @@ class PythonFramework:
             if self.apiClassSet :
                 apiClass = self.apiClassSet.get(commandList[self._0_API_KEY])
                 if apiClass and apiClass in [self.__class__, GitCommitter] :
-                    globals.success(self.__class__, f'running {commandList} command list')
+                    log.success(self.__class__, f'running {commandList} command list')
                     return self.handleCommandList(commandList)
                 elif apiClass :
                     globals.overrideApiTree(apiClass.__name__,package=apiClass.__name__)
                     api = apiClass(*self.args,**self.kwargs)
-                    globals.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
+                    log.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
                     return api.handleCommandList(commandList)
                 else :
-                    globals.failure(self.__class__,f'''couldn't instance {apiClass} api class''', globals.NOTHING)
+                    log.failure(self.__class__,f'''couldn't instance {apiClass} api class''', globals.NOTHING)
             else :
-                globals.debug(f'{commandList[self._0_API_KEY]} key called and running all alone')
+                log.debug(self.__class__,f'{commandList[self._0_API_KEY]} key called and running all alone')
                 return externalFunction(commandList,globals,**self.kwargs)
         except Exception as exception :
             errorMessage = str(exception)
@@ -94,14 +92,14 @@ class PythonFramework:
                 newArgs = *self.args,self.globals
                 try :
                     api = apiClass(*newArgs,**self.kwargs)
-                    globals.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
+                    log.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
                     return api.handleCommandList(commandList)
                 except Exception as exception :
                     secondErrorMessage = f', after first try: {str(exception)}'
                     newArgs = *self.args,self.session,self.globals
                     try :
                         api = apiClass(*newArgs,**self.kwargs)
-                        globals.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
+                        log.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
                         return api.handleCommandList(commandList)
                     except Exception as exception :
                         thirdErrorMessage = f', after second try: {str(exception)}'
@@ -121,8 +119,6 @@ class PythonFramework:
 
         self.apiSet = {}
         self.apiSet[self.API_KEY_FRAMEWORK] = {
-            self.COMMAND_ADD_API_BY_KEY_VALUE : self.addApiByKeyValue,
-
             self.COMMAND_NEW_SESSION : self.newSession,
             self.COMMAND_ADD_TO_SESSION : self.addToSession,
             self.COMMAND_REMOVE_FROM_SESSION : self.removeFromSession,
@@ -161,17 +157,17 @@ class PythonFramework:
 
     @SessionMethod
     def removeFromSession(self,commandList):
-        self.globals.debug(f'{self.__class__.__name__}.removeFromSession({commandList})')
+        log.debug(self.__class__,f'{self.__class__.__name__}.removeFromSession({commandList})')
         pass
 
     @SessionMethod
     def saveSession(self,commandList):
-        self.globals.debug(f'{self.__class__.__name__}.saveSession({commandList})')
+        log.debug(self.__class__,f'{self.__class__.__name__}.saveSession({commandList})')
         pass
 
     @SessionMethod
     def listAllSession(self,commandList):
-        self.globals.debug(f'{self.__class__.__name__}.listAllSession({commandList})')
+        self.log.debug(self.__class__,f'{self.__class__.__name__}.listAllSession({commandList})')
         pass
 
     @SessionMethod
@@ -187,59 +183,6 @@ class PythonFramework:
         return FrameworkCloseSession.closeSession(self,commandList)
 
     @SessionMethod
-    def addApiByKeyValue(self,commandList):
-        self.globals.debug(f'{self.__class__.__name__}.addApiByKeyValue({commandList})')
-        globals = self.globals
-        if not self.session :
-            sessionKey = globals.NOTHING
-            while sessionKey == globals.NOTHING :
-                sessionKey = input(f'{globals.TAB}Type session key: ')
-                if not sessionKey == globals.NOTHING :
-                    if self.repository.existsByKeyAndCommit(sessionKey,Session) :
-                        globals.warning(f'"{sessionKey}" session key already exists')
-                        self.session = self.repository.findByKeyAndCommit(sessionKey,Session)
-                    else :
-                        newSession = Session(sessionKey,FrameworkStatus[FrameworkConstant.INACTIVE],[])
-                        self.session = self.repository.saveAndCommit(newSession)
-                    print(f'session = {self.session}')
-        apiKey, apiClassName, gitUrl = self.createCredentials(commandList)
-        if apiKey and apiClassName and gitUrl :
-            try :
-                importApplicationScript = ADD_APPLICATION_FILE_SCRIPT.replace(APPLICATION_TOKEN,apiClassName)
-                if self.repository.existsByKeyAndCommit(apiKey,Api) :
-                    api = self.repository.findByKeyAndCommit(apiKey,Api)
-                    if api not in self.session.api_list :
-                        self.session.api_list.append(api)
-                        self.repository.saveAllAndCommit(self.session.api_list)
-                        self.printSuccess(f'"{api.key}" : "{api.class_name}" added successfully')
-                    globals.warning(f'"{api.key}" : "{api.class_name}" api already exists')
-                else :
-                    newApi = Api(apiKey,apiClassName,gitUrl,importApplicationScript,[self.session])
-                    print(f'newApi = {newApi}')
-                    newApi = self.repository.saveAndCommit(newApi)
-                    self.printSuccess(f'"{newApi.key}" : "{newApi.class_name}" added successfully')
-                return
-            except Exception as exception :
-                errorMessage = str(exception)
-        else :
-            errorMessage = 'failed to parse parameters'
-        globals.error(self.__class__.__class__, f'failed to add api due {commandList} command list', errorMessage)
-
-    def createCredentials(self,commandList):
-        self.globals.debug(f'{self.__class__.__name__}.commandList = {commandList}')
-        apiKey = apiClassName = gitUrl = None
-        try :
-            apiKey = commandList[self._0_ARGUMENT]
-            apiClassName = commandList[self._1_ARGUMENT]
-            if len(commandList[self._2_ARGUMENT:]) > 0 :
-                gitUrl = commandList[self._2_ARGUMENT]
-            else :
-                gitUrl = f'''{self.gitCommitter.gitUrl}/{apiClassName}.{self.gitCommitter.gitExtension}'''
-            return apiKey, apiClassName, gitUrl
-        except Exception as exception :
-            self.printError(self.__class__, f'''{self.__class__.__name__} error handling commandList "{commandList}"''', exception)
-
-    @SessionMethod
     def sessionCommandList(self,commandList):
         self.globals.printTree(self.apiSet,f'{self.globals.TAB}Command list: ',depth=2)
 
@@ -248,10 +191,13 @@ class PythonFramework:
         self.globals.printTree(self.commandList,f'{self.__class__.__name__} commandList',depth=1)
 
     def printSuccess(self,message):
-        print(f'{self.globals.TAB}{self.globals.SUCCESS}{message}')
+        self.printMessage(message,Constant.SUCCESS)
 
     def printError(self,message):
-        print(f'{self.globals.TAB}{self.globals.ERROR}{message}')
+        self.printMessage(message,Constant.ERROR)
+
+    def printMessage(self,message,level):
+        print(f'{Constant.TAB}{level}{message}')
 
 
 def run(*args,**kwargs):
@@ -265,5 +211,5 @@ def run(*args,**kwargs):
         sys.argv = []
         framework.handleSystemArgumentValue(commandList,externalFunction)
     else :
-        globals.debug(f'''Command list not found. Proceeding by default api launch''')
+        log.debug(self.__class__,f'''Command list not found. Proceeding by default api launch method''')
         externalFunction(commandList,globals,**kwargs)
