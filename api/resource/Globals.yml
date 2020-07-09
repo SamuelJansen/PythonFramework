@@ -1,7 +1,7 @@
 Globals:
     print-status: True
     api:
-        name: framework
+        name: PythonFramework
         repository :
             dialect: postgres
             user: jbqafgvnjszmoh
