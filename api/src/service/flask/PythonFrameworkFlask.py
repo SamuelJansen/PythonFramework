@@ -1,9 +1,9 @@
 from flask import Flask
 from flask_restful import Api
-from globals import Globals
+import globals
 import ResourceService, HomeResource
 
 application = Flask(__name__)
 api = Api(application)
-Globals.addTo(api)
+globals.addTo(api)
 ResourceService.addTo(api)

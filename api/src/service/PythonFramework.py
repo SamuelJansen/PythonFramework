@@ -1,4 +1,4 @@
-from PythonFrameworkTable import Model
+from FrameworkEntityAssociation import Model
 import SqlAlchemyHelper, GitCommitter
 import Api, Session
 import FrameworkConstant
@@ -29,6 +29,7 @@ class PythonFramework:
     _1_ARGUMENT = 3
     _2_ARGUMENT = 4
     _3_ARGUMENT = 5
+    _4_ARGUMENT = 6
 
     COMMAND_NEW_SESSION = 'new-session'
     COMMAND_OPEN_SESSION = 'open-session'
@@ -82,7 +83,7 @@ class PythonFramework:
                     log.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
                     return api.handleCommandList(commandList)
                 else :
-                    log.failure(self.__class__,f'''couldn't instance {apiClass} api class''', globals.NOTHING)
+                    log.failure(self.__class__,f'''couldn't instance api class of {commandList[self._0_API_KEY]}''', Constant.NOTHING)
             else :
                 log.debug(self.__class__,f'{commandList[self._0_API_KEY]} key called and running all alone')
                 return externalFunction(commandList,globals,**self.kwargs)
@@ -184,7 +185,7 @@ class PythonFramework:
 
     @SessionMethod
     def sessionCommandList(self,commandList):
-        self.globals.printTree(self.apiSet,f'{self.globals.TAB}Command list: ',depth=2)
+        self.globals.printTree(self.apiSet,f'{Constant.TAB}Command list: ',depth=2)
 
     @SessionMethod
     def printCommandList(self,commandList):
@@ -196,12 +197,15 @@ class PythonFramework:
     def printError(self,message):
         self.printMessage(message,Constant.ERROR)
 
+    def printWarning(self,message):
+        self.printMessage(message,Constant.WARNING)
+
     def printMessage(self,message,level):
         print(f'{Constant.TAB}{level}{message}')
 
 
 def run(*args,**kwargs):
-    ###- ...*args, externalFunction, globals, **kwargs
+    '''...*args, externalFunction, globals, **kwargs'''
     import sys
     externalFunction = args[-2]
     globals = args[-1]
@@ -211,5 +215,5 @@ def run(*args,**kwargs):
         sys.argv = []
         framework.handleSystemArgumentValue(commandList,externalFunction)
     else :
-        log.debug(self.__class__,f'''Command list not found. Proceeding by default api launch method''')
+        log.debug(PythonFramework,f'''Command list not found. Proceeding by default api launch method''')
         externalFunction(commandList,globals,**kwargs)

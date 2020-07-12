@@ -21,9 +21,10 @@ def getDefaultApiList(self) :
     if (self.repository.existsByKeyAndCommit(apiKey,Api)) :
         return [self.repository.findByKeyAndCommit(apiKey,Api)]
     else :
+        projectName = self.globals.getApiSetting('api.basic.api.project-name')
         apiClassName = self.globals.getApiSetting('api.basic.api.class-name')
         gitUrl = self.globals.getApiSetting('api.git.url')
         gitExtension = self.globals.getApiSetting('api.git.extension')
         importScript = ADD_APPLICATION_FILE_SCRIPT.replace(APPLICATION_TOKEN,apiClassName)
         sessionList = []
-        return [Api(apiKey,apiClassName,f'''{gitUrl}/{apiClassName}.{gitExtension}''',importScript,sessionList)]
+        return [Api(apiKey,projectName,apiClassName,f'''{gitUrl}/{apiClassName}.{gitExtension}''',importScript,sessionList)]
