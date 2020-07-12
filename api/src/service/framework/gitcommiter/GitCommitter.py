@@ -2,6 +2,7 @@ import subprocess
 from python_helper import Constant
 
 import WakeUpVoiceAssistant, VoiceAssistant, GitCommand
+from python_helper import log
 
 GitCommand = GitCommand.GitCommand
 
@@ -40,6 +41,9 @@ class GitCommitter:
     CLONE_PROJECT_IF_NEEDED = f'{GitCommand.KW_CLONE}-{KW_PROJECT}-{KW_IF_DASH_NEEDED}'
     ADD_COMMIT_PUSH_PROJECT = f'{GitCommand.KW_ADD}-{GitCommand.KW_COMMIT}-{GitCommand.KW_PUSH}-{KW_PROJECT}'
 
+    TOKEN_PROJECT_PATH = '__TOKEN_PROJECT_PATH__'
+    COMMAND_NEW_RELEASE_ALL = f'''python setup.py sdist{Constant.NEW_LINE}twine upload dist/* -u samuel.jansen -p dns8PyPI*'''
+    NEW_RELEASE_ALL = 'new-release-all'
 
     ADD_ENVIRONMENT_VARIABLE = f'add-environment-variable'
 
@@ -88,6 +92,8 @@ class GitCommitter:
             GitCommitter.CLONE_PROJECT_IF_NEEDED : self.cloneProjectIfNeeded,
             GitCommitter.ADD_COMMIT_PUSH_PROJECT : self.addCommitPushProject,
 
+            GitCommitter.NEW_RELEASE_ALL : self.newReleaseAll,
+
             GitCommitter.ADD_ENVIRONMENT_VARIABLE : self.addEnvironmentVariable
         }
 
@@ -124,6 +130,9 @@ class GitCommitter:
             except Exception as exception :
                 print(f'{self.globals.ERROR}{projectName}{globals.SPACE_DASH_SPACE}{command}{globals.NEW_LINE}{str(exception)}')
         return returnSet
+
+    def newReleaseAll(self,commandList):
+        log.debugReturnSet(self.__class__,'cloneProjectIfNeeded',None)
 
     def cloneProjectIfNeeded(self,commandList):
         globals = self.globals
