@@ -1,6 +1,7 @@
 import subprocess, codecs
+from python_helper import Constant
 
-import run, WakeUpVoiceAssistant, VoiceAssistant, GitCommand
+import WakeUpVoiceAssistant, VoiceAssistant, GitCommand
 
 GitCommand = GitCommand.GitCommand
 
@@ -63,7 +64,7 @@ class GitCommitter:
     def __init__(self,session,globals):
         self.globals = globals
         self.session = session
-        self.apiNameList = self.getApiNameList()
+        self.projectNameList = self.getProjectNameList()
         self.gitUrl = globals.getApiSetting(f'api.git.url')
         self.gitExtension = globals.getApiSetting(f'api.git.extension')
         self.commandSet = {
@@ -93,7 +94,7 @@ class GitCommitter:
     def runCommandList(self,commandList):
         globals = self.globals
         returnSet = {}
-        for projectName in self.apiNameList :
+        for projectName in self.projectNameList :
             try :
                 returnSet[projectName] = {}
                 for command in commandList :
@@ -158,21 +159,13 @@ class GitCommitter:
         localProjectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
         if localProjectNameList :
             commandListTree = {}
-            for api in self.session.api_list :
-            # for projectName in self.apiNameList :
-                if api.class_name not in localProjectNameList :
-                # if projectName not in localProjectNameList :
-                    # projectUrl = api.git_url
-                    # projectUrl = f'{self.gitUrl}{projectName}.{self.gitExtension}'
-                    command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,api.git_url)
-                    # command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,projectUrl)
+            for api in self.session.apiList :
+                if api.projectName not in localProjectNameList :
+                    command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,api.gitUrl)
                     processPath = f'{globals.localPath}{globals.apisRoot}'
-                    commandListTree[api.class_name] = [command]
-                    # commandListTree[projectName] = [command]
+                    commandListTree[api.projectName] = [command]
                 else :
-                    globals.warning(f'{api.class_name} already exists')
-                    # print(f'{projectName} already exists')
-
+                    globals.warning(f'{api.projectName} already exists')
             if commandListTree :
                 returnSet = self.runCommandListTree(commandListTree,path=processPath)
                 self.debugReturnSet('cloneAllIfNeeded',self.getReturnSetValue(returnSet))
@@ -329,13 +322,13 @@ class GitCommitter:
             return input
 
     def getImput(self,typingGetMessage):
-        return input(f'{typingGetMessage}{self.globals.COLON_SPACE}')
+        return input(f'{typingGetMessage}{Constant.COLON_SPACE}')
 
-    def getApiNameList(self):
+    def getProjectNameList(self):
         if self.session :
-            apiNameList = []
-            for api in self.session.api_list :
-                apiNameList.append(api.class_name)
-            return apiNameList
+            projectNameList = []
+            for api in self.session.apiList :
+                projectNameList.append(api.projectName)
+            return projectNameList
         else :
             return self.globals.apiNameList

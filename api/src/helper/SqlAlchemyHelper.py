@@ -32,8 +32,21 @@ KW_REPOSITORY_HOST = 'host'
 KW_REPOSITORY_PORT = 'port'
 KW_REPOSITORY_DATABASE = 'database'
 
+TO = ''''''
+ID = '''Id'''
+SEQ = '''Seq'''
+LIST = '''List'''
+
 def getNewModel() :
     return declarative_base()
+
+def attributeIt(modelName) :
+    return f'{modelName[0].lower()}{modelName[1:]}'
+
+def getManyToMany(son, father, Model) :
+    return Table(f'{son}{TO}{father}', Model.metadata,
+        Column(f'{attributeIt(son)}{ID}', Integer, ForeignKey(f'{son}.{ID.lower()}')),
+        Column(f'{attributeIt(father)}{ID}', Integer, ForeignKey(f'{father}.{ID.lower()}')))
 
 class SqlAlchemyHelper:
 

@@ -15,7 +15,7 @@ def loadApiClassSet(self) :
     }
     self.globals.debug(f'Loading api class set of {self.__class__.__name__}')
     if self.session :
-        for api in self.session.api_list :
+        for api in self.session.apiList :
             if api.key not in apiClassSet.keys() :
                 apiClassSet[api.key] = loadApiClass(self,api)
     if self.globals.debugStatus :
@@ -24,11 +24,11 @@ def loadApiClassSet(self) :
     return apiClassSet
 
 def loadApiClass(self,api) :
-    if api.class_name not in self.globals.apiNameList :
-        self.globals.makeApiAvaliable(api.class_name)
+    if api.projectName not in self.globals.apiNameList :
+        self.globals.makeApiAvaliable(api.projectName)
     try :
         with open(self.importApplicationScriptPath,self.globals.OVERRIDE,encoding = self.globals.ENCODING) as scriptFile :
-            scriptFile.write(''.join(api.import_script))
+            scriptFile.write(''.join(api.importScript))
         import Import
         apiClass = Import.getApiClass()
         eraseImportApplicationScript(self)
