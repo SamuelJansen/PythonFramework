@@ -47,8 +47,8 @@ class PythonFramework:
     COMMAND_COMMAND_LIST = 'command-list'
     commandList = {
         COMMAND_NEW_SESSION : [],
-        COMMAND_OPEN_SESSION : [],
-        COMMAND_ADD_TO_SESSION : ['sessionKey','apiKey','apiClassName','gitUrl'],
+        COMMAND_OPEN_SESSION : ['sessionKey'],
+        COMMAND_ADD_TO_SESSION : ['sessionKey','apiKey','apiProjectName','apiClassName','gitUrl'],
         COMMAND_REMOVE_FROM_SESSION : [],
         COMMAND_SAVE_SESSION : [],
         COMMAND_PRINT_SESSION : [],
