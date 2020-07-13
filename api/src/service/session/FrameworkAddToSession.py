@@ -39,12 +39,20 @@ def getCredentials(self,commandList) :
     try :
         sessionKey = commandList[self._0_ARGUMENT]
         apiKey = commandList[self._1_ARGUMENT]
-        apiProjectName = commandList[self._2_ARGUMENT]
-        apiClassName = commandList[self._3_ARGUMENT]
-        if len(commandList[self._4_ARGUMENT:]) >= 1 :
-            gitUrl = commandList[self._4_ARGUMENT]
+        if len(commandList) == self._1_ARGUMENT + 1 and self.repository.existsByKeyAndCommit(sessionKey,Session) and self.repository.existsByKeyAndCommit(apiKey,Api):
+            api = self.repository.findByKeyAndCommit(apiKey,Api)
+            apiProjectName = api.projectName
+            apiClassName = api.className
+            gitUrl = api.gitUrl
         else :
-            gitUrl = f'''{self.gitCommitter.gitUrl}{apiProjectName}.{self.gitCommitter.gitExtension}'''
+            sessionKey = commandList[self._0_ARGUMENT]
+            apiKey = commandList[self._1_ARGUMENT]
+            apiProjectName = commandList[self._2_ARGUMENT]
+            apiClassName = commandList[self._3_ARGUMENT]
+            if len(commandList[self._4_ARGUMENT:]) >= 1 :
+                gitUrl = commandList[self._4_ARGUMENT]
+            else :
+                gitUrl = f'''{self.gitCommitter.gitUrl}{apiProjectName}.{self.gitCommitter.gitExtension}'''
         return sessionKey, apiKey, apiProjectName, apiClassName, gitUrl
     except Exception as exception :
         self.printError(f'''{self.__class__.__name__} error handling commandList "{commandList}". Cause: {str(exception)}''')

@@ -45,6 +45,9 @@ class PythonFramework:
     COMMAND_RUN_FLASK = 'run-flask'
 
     COMMAND_COMMAND_LIST = 'command-list'
+
+    COMMAND_UPDATE_REQUIREMENTS = 'update-requirements'
+
     commandList = {
         COMMAND_NEW_SESSION : [],
         COMMAND_OPEN_SESSION : ['sessionKey'],
@@ -133,7 +136,9 @@ class PythonFramework:
             self.COMMAND_SESSION_COMMAND_LIST : self.sessionCommandList,
             self.COMMAND_COMMAND_LIST : self.printCommandList,
 
-            self.COMMAND_RUN_FLASK : self.runFlask
+            self.COMMAND_RUN_FLASK : self.runFlask,
+
+            self.COMMAND_UPDATE_REQUIREMENTS : self.updateRequirements
         }
         self.apiClassSet = self.loadApiClassSet()
         self.gitCommitter = GitCommitter(self.session,self.globals)
@@ -142,6 +147,12 @@ class PythonFramework:
     @LoadSession
     def loadApiClassSet(self):
         return FrameworkLoadApiClassSet.loadApiClassSet(self)
+
+    @SessionMethod
+    def updateRequirements(self,commandList):
+        self.globals.updateDependencyStatus = True
+        self.globals.updateDependencies()
+        self.globals.updateDependencyStatus = False
 
     @SessionMethod
     def runFlask(self,commandList) :
@@ -213,7 +224,7 @@ def run(*args,**kwargs):
     if len(commandList) > 0 :
         framework = PythonFramework(*args,**kwargs)
         sys.argv = []
-        framework.handleSystemArgumentValue(commandList,externalFunction)
+        return framework.handleSystemArgumentValue(commandList,externalFunction)
     else :
         log.debug(PythonFramework,f'''Command list not found. Proceeding by default api launch method''')
-        externalFunction(commandList,globals,**kwargs)
+        return externalFunction(commandList,globals,**kwargs)

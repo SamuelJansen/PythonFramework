@@ -1,6 +1,6 @@
-import os, sys
+import os, sys, subprocess
 from pathlib import Path
-from python_helper import Constant
+from python_helper import Constant, log
 
 class AttributeKey:
 
@@ -81,8 +81,10 @@ class Globals:
 
     LOCAL_GLOBALS_API_PATH = f'{SERVICE_BACK_SLASH}{FRAMEWORK_BACK_SLASH}{GLOBALS_BACK_SLASH}'
 
-    PIP_INSTALL = f'pip install'
-    UPDATE_PIP_INSTALL = 'python -m pip install --upgrade pip'
+    TOKEN_PIP_USER = '__TOKEN_PIP_USER__'
+    KW_SPACE_PIP_USER = f'{Constant.SPACE}--user'
+    PIP_INSTALL = f'python -m pip install --upgrade{TOKEN_PIP_USER} --force-reinstall'
+    UPDATE_PIP_INSTALL = f'python -m pip install --upgrade {TOKEN_PIP_USER} pip'
 
     CHARACTERE_FILTER = [
         '__'
@@ -183,6 +185,7 @@ class Globals:
 
             self.printTree(self.settingTree,f'{self.__class__.__name__} settings tree')
 
+        self.updateDependencyStatus = self.getApiSetting(AttributeKey.DEPENDENCY_UPDATE)
         self.update()
 
     def buildApplicationPath(self):
@@ -216,9 +219,9 @@ class Globals:
             self.apisRoot = Constant.NOTHING
             self.apisPath = Constant.NOTHING
 
-    def getApiPath(self,apiName):
-        if not apiName == Constant.NOTHING :
-             return f'{self.localPath}{self.apisRoot}{apiName}{self.OS_SEPARATOR}{self.baseApiPath}'
+    def getApiPath(self,apiPackageName):
+        if not apiPackageName == Constant.NOTHING :
+             return f'{self.localPath}{self.apisRoot}{apiPackageName}{self.OS_SEPARATOR}'###-'{self.baseApiPath}'
         return f'{self.localPath}{self.baseApiPath}'
 
     def update(self) :
@@ -243,8 +246,8 @@ class Globals:
             for apiPackage in apiPackageList :
                 if not apiPackage in list(self.apiTree.keys()) :
                     self.apiTree[apiPackage] = self.makePathTreeVisible(f'{apisPath}{apiPackage}')
-        if self.debugStatus :
-            self.printTree(self.apiTree,'Api tree')
+            if self.debugStatus :
+                self.printTree(self.apiTree,'Api tree (globalsEverithing is active)')
 
     def giveLocalVisibilityToFrameworkApis(self,apiPackageNameList):
         ###- if 'PythonFramework' == self.apiName :
@@ -592,22 +595,61 @@ class Globals:
 
     def updateDependencies(self):
         try :
-            if self.getApiSetting(AttributeKey.DEPENDENCY_UPDATE) :
-                import subprocess
+            if self.updateDependencyStatus :
                 moduleList = self.getApiSetting(AttributeKey.DEPENDENCY_LIST_WEB)
+                localPackageNameList = self.getApiSetting(AttributeKey.DEPENDENCY_LIST_LOCAL)
+                if moduleList or localPackageNameList :
+                    self.runUpdateCommand(Globals.UPDATE_PIP_INSTALL)
                 if moduleList :
-                    subprocess.Popen(Globals.UPDATE_PIP_INSTALL).wait()
                     for module in moduleList :
-                        subprocess.Popen(f'{Globals.PIP_INSTALL} {module}').wait()
-                resourceModuleList = self.getApiSetting(AttributeKey.DEPENDENCY_LIST_LOCAL)
-                if resourceModuleList :
-                    for resourceModule in resourceModuleList :
-                        command = f'{Globals.PIP_INSTALL} {resourceModule}'
-                        processPath = f'{self.getApiPath(self.apiName)}{Globals.RESOURCE_BACK_SLASH}{Globals.DEPENDENCY_BACK_SLASH}'
-                        subprocess.Popen(command,shell=True,cwd=processPath).wait()
-                        ###- subprocess.run(command,shell=True,capture_output=True,cwd=processPath)
+                        command = f'{Globals.PIP_INSTALL} {module}'
+                        self.runUpdateCommand(command)
+                if localPackageNameList :
+                    for localPackageName in localPackageNameList :
+                        localPackagePath = f'"{self.apiPath}{Globals.API_BACK_SLASH}{Globals.RESOURCE_BACK_SLASH}{Globals.DEPENDENCY_BACK_SLASH}{localPackageName}"'
+                        command = f'{Globals.PIP_INSTALL} {localPackagePath}'
+                        self.runUpdateCommand(command)
         except Exception as exception :
-            self.debug(f'Not possible to update dependencies. Cause: {str(exception)}')
+            self.error(self.__class__,'Not possible to update dependencies',exception)
+
+    def runUpdateCommand(self,command):
+        commonExceptionMessage = 'Not possible to update dependencies'
+        LOG_FIRST_TRY =     '[FIRST_TRY ] '
+        LOG_SECOND_TRY =    '[SECOND_TRY] '
+        LOG_COMMAND_COLON_SPACE = f'command{Constant.COLON_SPACE}'
+        LOG_RESPONSE_COLON_SPACE = f'response{Constant.COLON_SPACE}'
+        LOG_SUCCESS = 'SUCCESS'
+        LOG_FAIL = 'FAIL'
+        KW_DIDNT_RUN = 'DIDNT_RUN'
+        def getCommandLog(tryOrder,command):
+            return f'{tryOrder}{LOG_COMMAND_COLON_SPACE}{command}'
+        def getResponseLog(tryOrder,command,response):
+            logResponse = f'{tryOrder}{LOG_COMMAND_COLON_SPACE}{command}{LOG_RESPONSE_COLON_SPACE}'
+            if 1 == response :
+                return f'{logResponse}{LOG_FAIL}'
+            elif 0 == response :
+                return f'{logResponse}{LOG_SUCCESS}'
+            else :
+                return f'{logResponse}{response}'
+        commandFirstTry = command.replace(self.TOKEN_PIP_USER,self.KW_SPACE_PIP_USER)
+        self.debug(getCommandLog(LOG_FIRST_TRY,commandFirstTry))
+        responseFirstTry = KW_DIDNT_RUN
+        try :
+            responseFirstTry = subprocess.Popen(commandFirstTry).wait()
+            self.debug(getResponseLog(LOG_FIRST_TRY,commandFirstTry,responseFirstTry))
+        except Exception as exceptionFirstTry :
+            self.error(self.__class__,f'{commonExceptionMessage}',exceptionFirstTry)
+        if KW_DIDNT_RUN == responseFirstTry or 1 == responseFirstTry :
+            commandSecondTry = command.replace(self.TOKEN_PIP_USER,Constant.NOTHING)
+            self.debug(getCommandLog(LOG_SECOND_TRY,commandSecondTry))
+            responseSecondTry = KW_DIDNT_RUN
+            try :
+                responseSecondTry = subprocess.Popen(commandSecondTry).wait()
+                self.debug(getResponseLog(LOG_SECOND_TRY,commandSecondTry,responseSecondTry))
+            except Exception as exceptionSecondTry :
+                self.error(self.__class__,f'{commonExceptionMessage}',exceptionSecondTry)
+            if KW_DIDNT_RUN == responseFirstTry and KW_DIDNT_RUN == responseSecondTry :
+                log.error(self.__class__,f'Not possible to run {commandFirstTry}',Exception(f'Both attempt failed'))
 
     def getGlobalsPrintStatus(self):
         return self.getSetting(AttributeKey.getKeyByClassNameAndKey(Globals,AttributeKey.PRINT_STATUS))

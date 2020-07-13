@@ -1,5 +1,5 @@
 Globals:
-    print-status: True
+    print-status: False
     api:
         name: PythonFramework
         repository :
@@ -20,6 +20,9 @@ Globals:
         git:
             url: https://github.com/SamuelJansen/
             extension: git
+            PyPI:
+                username: samuel.jansen
+                password: dns8PyPI*
         basic:
             session:
                 key: basic-framework
@@ -35,5 +38,3 @@ Globals:
                 64: pip install PyAudio-0.2.11-cp38-cp38-win_amd64.whl ###- example
                 32: PyAudio-0.2.11-cp38-cp38-win32.whl ###- example
         link: https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio ###- library
-    distribution:
-        command-list: ['python setup.py sdist', 'twine upload dist/*']

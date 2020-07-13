@@ -1,5 +1,6 @@
 import subprocess
 from python_helper import Constant
+import GitCommitterNewRelease
 
 import WakeUpVoiceAssistant, VoiceAssistant, GitCommand
 from python_helper import log
@@ -14,6 +15,10 @@ class GitCommitter:
     COMMAND_INDEX = 1
     _1_ARGUMENT_INDEX = 2
     _2_ARGUMENT_INDEX = 3
+    _3_ARGUMENT_INDEX = 4
+    _4_ARGUMENT_INDEX = 5
+    _5_ARGUMENT_INDEX = 6
+    _6_ARGUMENT_INDEX = 7
 
     MISSING_SPACE = 'Missing '
 
@@ -22,6 +27,7 @@ class GitCommitter:
     KW_ALL = 'all'
     KW_IF_DASH_NEEDED = 'if-needed'
     KW_PROJECT = 'project'
+    KW_NEW_RELEASE = 'new-release'
 
     CLONE_ALL_IF_NEEDED = f'{GitCommand.KW_CLONE}-{KW_ALL}-{KW_IF_DASH_NEEDED}'
     CHECKOUT_B_ALL_IF_NEEDED = f'{GitCommand.KW_CHECKOUT}-b-{KW_ALL}-{KW_IF_DASH_NEEDED}'
@@ -41,9 +47,13 @@ class GitCommitter:
     CLONE_PROJECT_IF_NEEDED = f'{GitCommand.KW_CLONE}-{KW_PROJECT}-{KW_IF_DASH_NEEDED}'
     ADD_COMMIT_PUSH_PROJECT = f'{GitCommand.KW_ADD}-{GitCommand.KW_COMMIT}-{GitCommand.KW_PUSH}-{KW_PROJECT}'
 
-    TOKEN_PROJECT_PATH = '__TOKEN_PROJECT_PATH__'
-    COMMAND_NEW_RELEASE_ALL = f'''python setup.py sdist{Constant.NEW_LINE}twine upload dist/* -u samuel.jansen -p dns8PyPI*'''
-    NEW_RELEASE_ALL = 'new-release-all'
+    TOKEN_PY_PI_USERNAME = '__TOKEN_PY_PI_USERNAME__'
+    TOKEN_PY_PI_PASSWORD = '__TOKEN_PY_PI_PASSWORD__'
+    COMMAND_NEW_DIST = 'python setup.py sdist'
+    COMMAND_TWINE_UPLOAD = f'twine upload -u {TOKEN_PY_PI_USERNAME} -p {TOKEN_PY_PI_PASSWORD} dist/*'
+
+    NEW_RELEASE_ALL = f'{KW_NEW_RELEASE}-{KW_ALL}'
+    NEW_RELEASE_PROJECT = f'{KW_NEW_RELEASE}-{KW_PROJECT}'
 
     ADD_ENVIRONMENT_VARIABLE = f'add-environment-variable'
 
@@ -71,6 +81,8 @@ class GitCommitter:
         self.projectNameList = self.getProjectNameList()
         self.gitUrl = globals.getApiSetting(f'api.git.url')
         self.gitExtension = globals.getApiSetting(f'api.git.extension')
+        self.PyPIUsername = globals.getApiSetting(f'api.git.PyPI.username')
+        self.PyPIPassword = globals.getApiSetting(f'api.git.PyPI.password')
         self.commandSet = {
             GitCommitter.WAKE_UP_VOICE_ASSISTANT : self.wakeUpVoiceAssistant,
 
@@ -93,6 +105,7 @@ class GitCommitter:
             GitCommitter.ADD_COMMIT_PUSH_PROJECT : self.addCommitPushProject,
 
             GitCommitter.NEW_RELEASE_ALL : self.newReleaseAll,
+            GitCommitter.NEW_RELEASE_PROJECT : self.newReleaseProject,
 
             GitCommitter.ADD_ENVIRONMENT_VARIABLE : self.addEnvironmentVariable
         }
@@ -103,9 +116,9 @@ class GitCommitter:
         for projectName in self.projectNameList :
             try :
                 returnSet[projectName] = {}
+                processPath = f'{globals.localPath}{globals.apisRoot}{projectName}'
                 for command in commandList :
                     print(f'{globals.NEW_LINE}[{projectName}] {command}')
-                    processPath = f'{globals.localPath}{globals.apisRoot}{projectName}'
                     returnSet[projectName][command] = subprocess.run(command,shell=True,capture_output=True,cwd=processPath)
                     print(self.getProcessReturnValue(returnSet[projectName][command]))
                     # globals.debug(returnSet[projectName][command])
@@ -113,10 +126,10 @@ class GitCommitter:
                 print(f'{self.globals.ERROR}{projectName}{globals.SPACE_DASH_SPACE}{command}{globals.NEW_LINE}{str(exception)}')
         return returnSet
 
-    def runCommandListTree(self,commandListTree,path=None):
+    def runCommandTree(self,commandSet,path=None):
         globals = self.globals
         returnSet = {}
-        for projectName,commandList in commandListTree.items() :
+        for projectName,commandList in commandSet.items() :
             try :
                 returnSet[projectName] = {}
                 for command in commandList :
@@ -132,31 +145,35 @@ class GitCommitter:
         return returnSet
 
     def newReleaseAll(self,commandList):
-        log.debugReturnSet(self.__class__,'cloneProjectIfNeeded',None)
+        GitCommitterNewRelease.newReleaseAll(self,commandList)
+
+    def newReleaseProject(self,commandList):
+        GitCommitterNewRelease.newReleaseProject(self,commandList)
 
     def cloneProjectIfNeeded(self,commandList):
         globals = self.globals
         projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',commandList)
         localProjectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
-        commandListTree = {}
+        commandSet = {}
         if not localProjectNameList or projectName not in localProjectNameList :
             projectUrl = f'{self.gitUrl}{projectName}.{self.gitExtension}'
             command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,projectUrl)
             processPath = f'{globals.localPath}{globals.apisRoot}'
-            commandListTree[projectName] = [command]
+            commandSet[projectName] = [command]
         else :
             print(f'{projectName} already exists')
-        if commandListTree :
+        if commandSet :
             returnSet = {}
-            returnSet = self.runCommandListTree(commandListTree,path=processPath)
+            returnSet = self.runCommandTree(commandSet,path=processPath)
             self.debugReturnSet('cloneProjectIfNeeded',self.getReturnSetValue(returnSet))
+            return returnSet
 
     def addCommitPushProject(self,commandList):
         projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',commandList)
         commitMessage = self.getArg(GitCommitter._2_ARGUMENT_INDEX,'CommitMessage name',commandList)
         if projectName :
             commandCommit = GitCommand.COMMIT.replace(GitCommand.TOKEN_COMMIT_MESSAGE,commitMessage)
-            returnSet = self.runCommandListTree({projectName:[
+            returnSet = self.runCommandTree({projectName:[
                 GitCommand.ADD,
                 commandCommit,
                 GitCommand.PUSH
@@ -167,16 +184,16 @@ class GitCommitter:
         globals = self.globals
         localProjectNameList = list(globals.getPathTreeFromPath(f'{globals.localPath}{globals.apisRoot}').keys())
         if localProjectNameList :
-            commandListTree = {}
+            commandSet = {}
             for api in self.session.apiList :
                 if api.projectName not in localProjectNameList :
                     command = GitCommand.CLONE.replace(GitCommand.TOKEN_PROJECT_URL,api.gitUrl)
                     processPath = f'{globals.localPath}{globals.apisRoot}'
-                    commandListTree[api.projectName] = [command]
+                    commandSet[api.projectName] = [command]
                 else :
                     globals.warning(f'{api.projectName} already exists')
-            if commandListTree :
-                returnSet = self.runCommandListTree(commandListTree,path=processPath)
+            if commandSet :
+                returnSet = self.runCommandTree(commandSet,path=processPath)
                 self.debugReturnSet('cloneAllIfNeeded',self.getReturnSetValue(returnSet))
 
     def checkoutBAllIfNeeded(self,commandList):
@@ -190,8 +207,8 @@ class GitCommitter:
                         for key,value in specificReturnSet.items() :
                             if 'error' in self.getProcessReturnErrorValue(value) :
                                 command = GitCommand.CHECKOUT_DASH_B.replace(GitCommand.TOKEN_BRANCH_NAME,branchName)
-                                commandListTree = {projectName:[command]}
-                                returnCorrectionSet = self.runCommandListTree(commandListTree)
+                                commandSet = {projectName:[command]}
+                                returnCorrectionSet = self.runCommandTree(commandSet)
             self.debugReturnSet('checkoutBAllIfNeeded',self.getReturnSetValue(returnSet))
 
     def pushSetUpStreamOriginAllIfNedded(self,commandList):
@@ -205,14 +222,14 @@ class GitCommitter:
                         for line in self.getProcessReturnErrorValue(value).split(self.globals.NEW_LINE) :
                             if GitCommand.PUSH_SET_UPSTREAM_ORIGIN in line :
                                 commandPush = GitCommand.BRANCH
-                                returnCorrectionSet[projectName][commandPush] = self.runCommandListTree({projectName:[commandPush]})[projectName][commandPush]
+                                returnCorrectionSet[projectName][commandPush] = self.runCommandTree({projectName:[commandPush]})[projectName][commandPush]
                                 dirtyBranchNameList = self.getProcessReturnValue(returnCorrectionSet[projectName][commandPush]).split(self.globals.NEW_LINE)
                                 if dirtyBranchNameList :
                                     for dirtyBranchName in dirtyBranchNameList :
                                         if '*' in dirtyBranchName :
                                             branchName = dirtyBranchName.split()[1].strip()
                                             commandPushSetUpStreamAll = GitCommand.PUSH_SET_UPSTREAM_ORIGIN_BRANCH.replace(GitCommand.TOKEN_BRANCH_NAME,branchName)
-                                            returnCorrectionSet[projectName][commandPushSetUpStreamAll] = self.runCommandListTree({projectName:[commandPushSetUpStreamAll]})[projectName][commandPushSetUpStreamAll]
+                                            returnCorrectionSet[projectName][commandPushSetUpStreamAll] = self.runCommandTree({projectName:[commandPushSetUpStreamAll]})[projectName][commandPushSetUpStreamAll]
         self.debugReturnSet('pushSetUpStreamOriginAllIfNedded',self.getReturnSetValue(returnSet))
 
     def addCommitPushSetUpStreamOriginAllIfNedded(self,commandList):
