@@ -1,5 +1,5 @@
 import globals, SqlAlchemyHelper
-from FrameworkModel import Model
+import FrameworkModel
 import HomeController, ConfigController, SessionController
 
 controllerList = [
@@ -13,7 +13,12 @@ def addControllerTo(api) :
         api.add_resource(controller, controller.url)
 
 def addRepositoryTo(api) :
-    api.repository = SqlAlchemyHelper.SqlAlchemyHelper(model=Model,globals=api.globals)
+    print('here')
+    api.repository = SqlAlchemyHelper.SqlAlchemyHelper(
+        model = FrameworkModel.Model,
+        globals = api.globals
+    )
+    print('after here')
 
 def addApiResourcesTo(api) :
     globals.addTo(api)

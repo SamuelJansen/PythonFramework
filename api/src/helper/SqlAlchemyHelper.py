@@ -108,7 +108,7 @@ class SqlAlchemyHelper:
             self.name = name
 
         if globals :
-            globals.debug(f'Repository consiguration:')
+            globals.debug(f'Repository configuration:')
             globals.debug(f'{globals.TAB_UNITS * globals.SPACE}dialect = {self.dialect}')
             globals.debug(f'{globals.TAB_UNITS * globals.SPACE}user = wops!')
             globals.debug(f'{globals.TAB_UNITS * globals.SPACE}password = wops!')

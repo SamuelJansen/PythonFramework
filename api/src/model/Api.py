@@ -1,6 +1,5 @@
 from SqlAlchemyHelper import *
 from FrameworkModel import *
-from Session import *
 from python_helper import Constant
 
 class Api(Model):
