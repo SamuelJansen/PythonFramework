@@ -1,5 +1,5 @@
 import webbrowser
-from FrameworkEntityAssociation import Model
+from FrameworkModel import Model
 import SqlAlchemyHelper, GitCommitter
 import Api, Session
 import FrameworkConstant

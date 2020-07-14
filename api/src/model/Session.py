@@ -1,5 +1,5 @@
 from SqlAlchemyHelper import *
-from FrameworkEntityAssociation import *
+from FrameworkModel import *
 
 class Session(Model):
     __tablename__ = SESSION

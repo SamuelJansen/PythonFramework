@@ -1,2 +1,0 @@
-HOME = '/'
-GLOBALS = '/config'

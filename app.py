@@ -9,7 +9,8 @@ globals = Globals(__file__,
 )
 
 import PythonFrameworkFlask
-app = PythonFrameworkFlask.application
+app = PythonFrameworkFlask.app
+api = PythonFrameworkFlask.api
 
 if __name__ == '__main__' :
     app.run(debug=True)
