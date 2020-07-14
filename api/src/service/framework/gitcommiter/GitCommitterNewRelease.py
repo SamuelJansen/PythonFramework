@@ -36,7 +36,7 @@ def newReleaseProject(self,commandList) :
 
 def runNewRelease(self,commandSet) :
     try :
-        returnSet = self.runCommandTree(commandSet)
+        returnSet = self.runCommandSet(commandSet)
         self.debugReturnSet('newReleaseAll',self.getReturnSetValue(returnSet))
         return returnSet
     except Exception as exception :
