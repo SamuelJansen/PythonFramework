@@ -1,7 +1,7 @@
-from flask import Flask
-from flask_restful import Api
+import flask
+import flask_restful
 import ResourceService
 
-app = Flask(__name__)
-api = Api(app)
+app = flask.Flask(__name__)
+api = flask_restful.Api(app)
 ResourceService.addApiResourcesTo(api)

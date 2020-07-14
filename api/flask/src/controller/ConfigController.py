@@ -1,8 +1,8 @@
-from flask_restful import Resource
+import flask_restful
 from globals import GlobalsResource
 
 @GlobalsResource(path = '/config')
-class ConfigController(Resource):
+class ConfigController(flask_restful.Resource):
 
     def get(self):
         return {

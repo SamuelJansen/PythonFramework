@@ -1,4 +1,5 @@
 from globals import Globals
+print("run")
 globals = Globals(__file__,
     debugStatus = True,
     warningStatus = True,
@@ -7,6 +8,7 @@ globals = Globals(__file__,
     failureStatus = True,
     settingStatus = True
 )
+print("after run")
 
 def pythonFrameworkDefaultRun(commandList,globals,**kwargs):
     globals.debug(f'"pythonFrameworkDefaultRun()" method not implemented')

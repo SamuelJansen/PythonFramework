@@ -1,10 +1,10 @@
-from flask_restful import Resource
+import flask_restful
 from globals import GlobalsResource
 import Session
 import json
 
 @GlobalsResource(path = '/sessions')
-class SessionController(Resource):
+class SessionController(flask_restful.Resource):
 
     def get(self):
         sessionList = self.api.repository.findAllAndCommit(Session.Session)
