@@ -1,6 +1,4 @@
 from globals import Globals
-
-print(f'__file__ {__file__}')
 globals = Globals(__file__,
     debugStatus = True,
     warningStatus = True,
@@ -12,8 +10,6 @@ globals = Globals(__file__,
 
 def pythonFrameworkDefaultRunMethod(commandList,globals,**kwargs):
     globals.debug(f'"pythonFrameworkDefaultRunMethod()" method not implemented')
-
-print(f'after __file__ {__file__}')
 
 if __name__ == '__main__' :
     globals.giveLocalVisibilityToFrameworkApis([
