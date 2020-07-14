@@ -1,10 +1,10 @@
 import globals, SqlAlchemyHelper
 from FrameworkModel import Model
-import HomeController, GlobalsController, SessionController
+import HomeController, ConfigController, SessionController
 
 controllerList = [
     HomeController.HomeController,
-    GlobalsController.GlobalsController,
+    ConfigController.ConfigController,
     SessionController.SessionController
 ]
 
@@ -17,4 +17,5 @@ def addRepositoryTo(api) :
 
 def addApiResourcesTo(api) :
     globals.addTo(api)
+    addRepositoryTo(api)
     addControllerTo(api)

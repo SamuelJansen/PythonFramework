@@ -2,7 +2,7 @@ from flask_restful import Resource
 from globals import GlobalsResource
 
 @GlobalsResource(path = '/config')
-class GlobalsController(Resource):
+class ConfigController(Resource):
 
     def get(self):
         return {

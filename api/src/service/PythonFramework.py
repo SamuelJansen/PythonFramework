@@ -157,9 +157,9 @@ class PythonFramework:
 
     @SessionMethod
     def runFlask(self,commandList) :
-        from PythonFrameworkFlask import application
+        from PythonFrameworkFlask import app
         webbrowser.open_new('http://127.0.0.1:5000/')
-        flaskReturn = application.run()
+        flaskReturn = app.run()
         return flaskReturn
 
     @SessionMethod
