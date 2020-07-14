@@ -1,8 +1,11 @@
 from SqlAlchemyHelper import *
-from FrameworkModel import *
 from python_helper import Constant
+import FrameworkModel
 
-class Api(Model):
+API = FrameworkModel.API
+SESSION = FrameworkModel.SESSION
+
+class Api(FrameworkModel.Model):
     __tablename__ = API
 
     id = Column(Integer(), Sequence(f'{__tablename__}{ID}{SEQ}'), primary_key=True)
@@ -12,7 +15,7 @@ class Api(Model):
     gitUrl = Column(String(256),unique=True)
 
     importScript = Column(String(1024),unique=True)
-    sessionList = relationship(SESSION, secondary=apiToSessionAssociation, back_populates=f'{attributeIt(__tablename__)}{LIST}')
+    sessionList = relationship(SESSION, secondary=FrameworkModel.apiToSessionAssociation, back_populates=f'{attributeIt(__tablename__)}{LIST}')
 
     def __init__(self,key,projectName,className,gitUrl,importScript,sessionList):
         self.key = key
