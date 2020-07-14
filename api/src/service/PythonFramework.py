@@ -1,3 +1,4 @@
+import webbrowser
 from FrameworkEntityAssociation import Model
 import SqlAlchemyHelper, GitCommitter
 import Api, Session
@@ -157,7 +158,9 @@ class PythonFramework:
     @SessionMethod
     def runFlask(self,commandList) :
         from PythonFrameworkFlask import application
-        return application.run()
+        webbrowser.open_new('http://127.0.0.1:5000/')
+        flaskReturn = application.run()
+        return flaskReturn
 
     @SessionMethod
     def newSession(self,commandList):

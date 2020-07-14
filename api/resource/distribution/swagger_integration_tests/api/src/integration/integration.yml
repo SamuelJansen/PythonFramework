@@ -1,3 +1,0 @@
-main-swagger-url: 'https://here/comes/my/main/swagger/url/its/usually/homolog/swagger-ui.html'
-authorization-admin : 'authentication_token'
-authorization-user : 'other_authentication_token'

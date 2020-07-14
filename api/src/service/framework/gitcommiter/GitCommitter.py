@@ -55,6 +55,8 @@ class GitCommitter:
     NEW_RELEASE_ALL = f'{KW_NEW_RELEASE}-{KW_ALL}'
     NEW_RELEASE_PROJECT = f'{KW_NEW_RELEASE}-{KW_PROJECT}'
 
+    DEPLOY_HEROKU_PROJECT = 'deploy-heroku-project'
+
     ADD_ENVIRONMENT_VARIABLE = f'add-environment-variable'
 
     SKIP = 'skip'
@@ -107,6 +109,8 @@ class GitCommitter:
             GitCommitter.NEW_RELEASE_ALL : self.newReleaseAll,
             GitCommitter.NEW_RELEASE_PROJECT : self.newReleaseProject,
 
+            GitCommitter.DEPLOY_HEROKU_PROJECT : self.deployHerokuProject,
+
             GitCommitter.ADD_ENVIRONMENT_VARIABLE : self.addEnvironmentVariable
         }
 
@@ -126,7 +130,7 @@ class GitCommitter:
                 print(f'{self.globals.ERROR}{projectName}{globals.SPACE_DASH_SPACE}{command}{globals.NEW_LINE}{str(exception)}')
         return returnSet
 
-    def runCommandTree(self,commandSet,path=None):
+    def runCommandSet(self,commandSet,path=None):
         globals = self.globals
         returnSet = {}
         for projectName,commandList in commandSet.items() :
@@ -143,6 +147,26 @@ class GitCommitter:
             except Exception as exception :
                 print(f'{self.globals.ERROR}{projectName}{globals.SPACE_DASH_SPACE}{command}{globals.NEW_LINE}{str(exception)}')
         return returnSet
+
+    def deployHerokuProject(self,commandList):
+        projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',commandList)
+        commitMessage = self.getArg(GitCommitter._2_ARGUMENT_INDEX,f'{projectName} commit message',commandList)
+        if projectName :
+            commandCommit = GitCommand.COMMIT.replace(GitCommand.TOKEN_COMMIT_MESSAGE,commitMessage)
+            commandCheckoutMaster = GitCommand.CHECKOUT.replace(GitCommand.TOKEN_BRANCH_NAME,GitCommand.KW_MASTER_BRANCH)
+            commandMergeOriginDevelop = GitCommand.MERGE_ORIGIN.replace(GitCommand.TOKEN_BRANCH_NAME,GitCommand.KW_DEVELOP_BRANCH)
+            commandPushHerokuMaster = f'{GitCommand.PUSH} heroku master'
+            returnSet = self.runCommandSet({projectName:[
+                GitCommand.ADD,
+                commandCommit,
+                GitCommand.PUSH,
+                GitCommand.PUSH,
+                commandCheckoutMaster,
+                commandMergeOriginDevelop,
+                GitCommand.PUSH,
+                commandPushHerokuMaster
+            ]})
+            self.debugReturnSet('deployHerokuProject',self.getReturnSetValue(returnSet))
 
     def newReleaseAll(self,commandList):
         GitCommitterNewRelease.newReleaseAll(self,commandList)
@@ -164,16 +188,16 @@ class GitCommitter:
             print(f'{projectName} already exists')
         if commandSet :
             returnSet = {}
-            returnSet = self.runCommandTree(commandSet,path=processPath)
+            returnSet = self.runCommandSet(commandSet,path=processPath)
             self.debugReturnSet('cloneProjectIfNeeded',self.getReturnSetValue(returnSet))
             return returnSet
 
     def addCommitPushProject(self,commandList):
         projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',commandList)
-        commitMessage = self.getArg(GitCommitter._2_ARGUMENT_INDEX,'CommitMessage name',commandList)
+        commitMessage = self.getArg(GitCommitter._2_ARGUMENT_INDEX,f'{projectName} commit message',commandList)
         if projectName :
             commandCommit = GitCommand.COMMIT.replace(GitCommand.TOKEN_COMMIT_MESSAGE,commitMessage)
-            returnSet = self.runCommandTree({projectName:[
+            returnSet = self.runCommandSet({projectName:[
                 GitCommand.ADD,
                 commandCommit,
                 GitCommand.PUSH
@@ -193,7 +217,7 @@ class GitCommitter:
                 else :
                     globals.warning(f'{api.projectName} already exists')
             if commandSet :
-                returnSet = self.runCommandTree(commandSet,path=processPath)
+                returnSet = self.runCommandSet(commandSet,path=processPath)
                 self.debugReturnSet('cloneAllIfNeeded',self.getReturnSetValue(returnSet))
 
     def checkoutBAllIfNeeded(self,commandList):
@@ -208,7 +232,7 @@ class GitCommitter:
                             if 'error' in self.getProcessReturnErrorValue(value) :
                                 command = GitCommand.CHECKOUT_DASH_B.replace(GitCommand.TOKEN_BRANCH_NAME,branchName)
                                 commandSet = {projectName:[command]}
-                                returnCorrectionSet = self.runCommandTree(commandSet)
+                                returnCorrectionSet = self.runCommandSet(commandSet)
             self.debugReturnSet('checkoutBAllIfNeeded',self.getReturnSetValue(returnSet))
 
     def pushSetUpStreamOriginAllIfNedded(self,commandList):
@@ -222,14 +246,14 @@ class GitCommitter:
                         for line in self.getProcessReturnErrorValue(value).split(self.globals.NEW_LINE) :
                             if GitCommand.PUSH_SET_UPSTREAM_ORIGIN in line :
                                 commandPush = GitCommand.BRANCH
-                                returnCorrectionSet[projectName][commandPush] = self.runCommandTree({projectName:[commandPush]})[projectName][commandPush]
+                                returnCorrectionSet[projectName][commandPush] = self.runCommandSet({projectName:[commandPush]})[projectName][commandPush]
                                 dirtyBranchNameList = self.getProcessReturnValue(returnCorrectionSet[projectName][commandPush]).split(self.globals.NEW_LINE)
                                 if dirtyBranchNameList :
                                     for dirtyBranchName in dirtyBranchNameList :
                                         if '*' in dirtyBranchName :
                                             branchName = dirtyBranchName.split()[1].strip()
                                             commandPushSetUpStreamAll = GitCommand.PUSH_SET_UPSTREAM_ORIGIN_BRANCH.replace(GitCommand.TOKEN_BRANCH_NAME,branchName)
-                                            returnCorrectionSet[projectName][commandPushSetUpStreamAll] = self.runCommandTree({projectName:[commandPushSetUpStreamAll]})[projectName][commandPushSetUpStreamAll]
+                                            returnCorrectionSet[projectName][commandPushSetUpStreamAll] = self.runCommandSet({projectName:[commandPushSetUpStreamAll]})[projectName][commandPushSetUpStreamAll]
         self.debugReturnSet('pushSetUpStreamOriginAllIfNedded',self.getReturnSetValue(returnSet))
 
     def addCommitPushSetUpStreamOriginAllIfNedded(self,commandList):
