@@ -24,10 +24,15 @@ class GitCommitter:
 
     WAKE_UP_VOICE_ASSISTANT = 'voice-assistant'
 
+    TOKEN_PY_PI_USERNAME = '__TOKEN_PY_PI_USERNAME__'
+    TOKEN_PY_PI_PASSWORD = '__TOKEN_PY_PI_PASSWORD__'
+
     KW_ALL = 'all'
     KW_IF_DASH_NEEDED = 'if-needed'
     KW_PROJECT = 'project'
     KW_NEW_RELEASE = 'new-release'
+
+    SET_GLOBAL_CREDENTIALS = 'set-global-credentials'
 
     CLONE_ALL_IF_NEEDED = f'{GitCommand.KW_CLONE}-{KW_ALL}-{KW_IF_DASH_NEEDED}'
     CHECKOUT_B_ALL_IF_NEEDED = f'{GitCommand.KW_CHECKOUT}-b-{KW_ALL}-{KW_IF_DASH_NEEDED}'
@@ -47,8 +52,6 @@ class GitCommitter:
     CLONE_PROJECT_IF_NEEDED = f'{GitCommand.KW_CLONE}-{KW_PROJECT}-{KW_IF_DASH_NEEDED}'
     ADD_COMMIT_PUSH_PROJECT = f'{GitCommand.KW_ADD}-{GitCommand.KW_COMMIT}-{GitCommand.KW_PUSH}-{KW_PROJECT}'
 
-    TOKEN_PY_PI_USERNAME = '__TOKEN_PY_PI_USERNAME__'
-    TOKEN_PY_PI_PASSWORD = '__TOKEN_PY_PI_PASSWORD__'
     COMMAND_NEW_DIST = 'python setup.py sdist'
     COMMAND_TWINE_UPLOAD = f'twine upload -u {TOKEN_PY_PI_USERNAME} -p {TOKEN_PY_PI_PASSWORD} dist/*'
 
@@ -57,7 +60,7 @@ class GitCommitter:
 
     DEPLOY_HEROKU_PROJECT = 'deploy-heroku-project'
 
-    ADD_ENVIRONMENT_VARIABLE = f'add-environment-variable'
+    ADD_ENVIRONMENT_VARIABLE = 'add-environment-variable'
 
     SKIP = 'skip'
 
@@ -87,6 +90,8 @@ class GitCommitter:
         self.PyPIPassword = globals.getApiSetting(f'api.git.PyPI.password')
         self.commandSet = {
             GitCommitter.WAKE_UP_VOICE_ASSISTANT : self.wakeUpVoiceAssistant,
+
+            GitCommitter.SET_GLOBAL_CREDENTIALS : self.setGlobalCredentials,
 
             GitCommitter.CLONE_ALL_IF_NEEDED : self.cloneAllIfNeeded,
             GitCommitter.CHECKOUT_B_ALL_IF_NEEDED : self.checkoutBAllIfNeeded,
@@ -122,9 +127,9 @@ class GitCommitter:
                 returnSet[projectName] = {}
                 processPath = f'{globals.localPath}{globals.apisRoot}{projectName}'
                 for command in commandList :
-                    print(f'{globals.NEW_LINE}[{projectName}] {command}')
+                    # print(f'{globals.NEW_LINE}[{projectName}] {command}')
                     returnSet[projectName][command] = subprocess.run(command,shell=True,capture_output=True,cwd=processPath)
-                    print(self.getProcessReturnValue(returnSet[projectName][command]))
+                    # print(self.getProcessReturnValue(returnSet[projectName][command]))
                     # globals.debug(returnSet[projectName][command])
             except Exception as exception :
                 print(f'{self.globals.ERROR}{projectName}{globals.SPACE_DASH_SPACE}{command}{globals.NEW_LINE}{str(exception)}')
@@ -141,12 +146,26 @@ class GitCommitter:
                         processPath = path
                     else :
                         processPath = f'{globals.localPath}{globals.apisRoot}{projectName}'
-                    print(f'{globals.NEW_LINE}[{projectName}] {command} {processPath}')
+                    # print(f'{globals.NEW_LINE}[{projectName}] {command} {processPath}')
                     returnSet[projectName][command] = subprocess.run(command,shell=True,capture_output=True,cwd=processPath)
-                    print(self.getProcessReturnValue(returnSet[projectName][command]))
+                    # print(self.getProcessReturnValue(returnSet[projectName][command]))
             except Exception as exception :
                 print(f'{self.globals.ERROR}{projectName}{globals.SPACE_DASH_SPACE}{command}{globals.NEW_LINE}{str(exception)}')
         return returnSet
+
+    def setGlobalCredentials(self,commandList):
+        userName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'User name',commandList)
+        userEmail = self.getArg(GitCommitter._2_ARGUMENT_INDEX,f'User email',commandList)
+        commandConfigGlobalUserName = GitCommand.CONFIG_GLOBAL_USER_NAME.replace(GitCommand.TOKEN_USER_NAME,userName)
+        commandConfigGlobalUserEmail = GitCommand.CONFIG_GLOBAL_USER_EMAIL.replace(GitCommand.TOKEN_USER_EMAIL,userEmail)
+        commandSet = {}
+        for api in self.session.apiList :
+            commandSet[api.projectName] = [
+                commandConfigGlobalUserName,
+                commandConfigGlobalUserEmail
+            ]
+        returnSet = self.runCommandSet(commandSet)
+        return self.debugReturnSet('setGlobalCredentials',self.getReturnSetValue(returnSet))
 
     def deployHerokuProject(self,commandList):
         projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',commandList)
@@ -155,7 +174,6 @@ class GitCommitter:
             commandCommit = GitCommand.COMMIT.replace(GitCommand.TOKEN_COMMIT_MESSAGE,commitMessage)
             commandCheckoutMaster = GitCommand.CHECKOUT.replace(GitCommand.TOKEN_BRANCH_NAME,GitCommand.KW_MASTER_BRANCH)
             commandMergeOriginDevelop = GitCommand.MERGE_ORIGIN.replace(GitCommand.TOKEN_BRANCH_NAME,GitCommand.KW_DEVELOP_BRANCH)
-            commandPushHerokuMaster = f'{GitCommand.PUSH} heroku master'
             returnSet = self.runCommandSet({projectName:[
                 GitCommand.ADD,
                 commandCommit,
@@ -164,15 +182,15 @@ class GitCommitter:
                 commandCheckoutMaster,
                 commandMergeOriginDevelop,
                 GitCommand.PUSH,
-                commandPushHerokuMaster
+                GitCommand.PUSH_HEROKU_MASTER
             ]})
-            self.debugReturnSet('deployHerokuProject',self.getReturnSetValue(returnSet))
+            return self.debugReturnSet('deployHerokuProject',self.getReturnSetValue(returnSet))
 
     def newReleaseAll(self,commandList):
-        GitCommitterNewRelease.newReleaseAll(self,commandList)
+        return GitCommitterNewRelease.newReleaseAll(self,commandList)
 
     def newReleaseProject(self,commandList):
-        GitCommitterNewRelease.newReleaseProject(self,commandList)
+        return GitCommitterNewRelease.newReleaseProject(self,commandList)
 
     def cloneProjectIfNeeded(self,commandList):
         globals = self.globals
