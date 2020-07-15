@@ -16,7 +16,7 @@ class GitCommand:
     KW_MERGE = 'merge'
     KW_ORIGIN = 'origin'
     KW_SET_UPSTREAM = 'set-upstream'
-    
+
     KW_MASTER_BRANCH = 'master'
     KW_DEVELOP_BRANCH = 'develop'
 
@@ -46,4 +46,4 @@ class GitCommand:
     PUSH_SET_UPSTREAM_ORIGIN_BRANCH = f'{PUSH_SET_UPSTREAM_ORIGIN} {TOKEN_BRANCH_NAME}'
 
 
-    NEW_RELEASE = f'{TOKEN_PROJECT_URL}/releases/new?tag={TOKEN_RELEASE_VERSION}&target={TOKEN_TARGET}&title={TOKEN_TITLE}&body={TOKEN_DESCRIPTION}'
+    NEW_RELEASE = f'{TOKEN_PROJECT_URL}/releases/new?tag=v{TOKEN_RELEASE_VERSION}&target={TOKEN_TARGET}&title={TOKEN_TITLE}&body={TOKEN_DESCRIPTION}'
