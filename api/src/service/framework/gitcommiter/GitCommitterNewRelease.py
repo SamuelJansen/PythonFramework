@@ -13,7 +13,7 @@ def newReleaseAll(self,commandList) :
                 commitMessageArgumentIndex = self._2_ARGUMENT_INDEX
                 updateCommandSet(self,projectName,versionArgumentIndex,commitMessageArgumentIndex,commandSet,commandList)
             else :
-                self.globals.error(self.__class__,'Project nme cannot be null', Constant.NOTHING)
+                self.globals.error(self.__class__,'Project name cannot be null', Constant.NOTHING)
                 return
         return runNewRelease(self,commandSet)
     except Exception as exception :
@@ -28,7 +28,7 @@ def newReleaseProject(self,commandList) :
             commitMessageArgumentIndex = self._3_ARGUMENT_INDEX
             updateCommandSet(self,projectName,versionArgumentIndex,commitMessageArgumentIndex,commandSet,commandList)
         else :
-            self.globals.error(self.__class__,'Project nme cannot be null', Constant.NOTHING)
+            self.globals.error(self.__class__,'Project name cannot be null', Constant.NOTHING)
             return
         return runNewRelease(self,commandSet)
     except Exception as exception :
