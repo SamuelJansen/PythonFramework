@@ -1,4 +1,4 @@
-from SqlAlchemyHelper import *
+from SqlAlchemyProxy import *
 import FrameworkModel
 
 API = FrameworkModel.API
@@ -10,7 +10,8 @@ class Session(FrameworkModel.Model):
     id = Column(Integer(), Sequence(f'{__tablename__}{ID}{SEQ}'), primary_key=True)
     key = Column(String(128), unique=True)
     status = Column(String(64))
-    apiList = relationship(API, secondary=FrameworkModel.apiToSessionAssociation, back_populates=f'{attributeIt(__tablename__)}{LIST}')
+    apiList = FrameworkModel.apiList ###- relationship(API, secondary=FrameworkModel.apiToSessionAssociation, back_populates=f'{attributeIt(__tablename__)}{LIST}')
+    # apiList = getLeftSideManyToMany(API, SESSION, FrameworkModel.Model)
 
     def __init__(self,key,status,apiList):
         self.key = key

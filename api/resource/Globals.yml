@@ -31,7 +31,7 @@ Globals:
                 project-name: PythonFramework
                 class-name: PythonFramework
     python:
-        version: '3.8'
+        version: 3.8
         version-command: python --version
         py-audio:
             install-example:

@@ -1,6 +1,7 @@
 import webbrowser
+from python_helper import log, Constant
 from FrameworkModel import Model
-import SqlAlchemyHelper, GitCommitter
+import SqlAlchemyProxy, GitCommitter
 import Api, Session
 import FrameworkConstant
 from LoadSessionAnnotation import LoadSession
@@ -8,12 +9,11 @@ from SessionMethodAnnotation import SessionMethod
 from PythonFrameworkApplicationScript import *
 import FrameworkNewSession, FrameworkOpenSession, FrameworkPrintSession, FrameworkLoadApiClassSet, FrameworkCloseSession, FrameworkAddToSession
 import FrameworkSessionHelper
-from python_helper import log, Constant
 
 Api = Api.Api
 Session = Session.Session
 GitCommitter = GitCommitter.GitCommitter
-SqlAlchemyHelper = SqlAlchemyHelper.SqlAlchemyHelper
+SqlAlchemyProxy = SqlAlchemyProxy.SqlAlchemyProxy
 FrameworkStatus = FrameworkConstant.Status
 
 class PythonFramework:
@@ -119,7 +119,7 @@ class PythonFramework:
         self.args = args[:-2]
         self.kwargs = kwargs
         self.name = self.globals.getApiSetting('api.name')
-        self.repository = SqlAlchemyHelper(model=Model,globals=self.globals)
+        self.repository = SqlAlchemyProxy(model=Model,globals=self.globals)
         self.importApplicationScriptPath = f'{self.globals.apiPath}{self.globals.baseApiPath}runtime{self.globals.BACK_SLASH}{IMPORT_SCRITP_FILE_NAME}.{self.globals.PYTHON_EXTENSION}'
 
         self.apiSet = {}
@@ -156,7 +156,7 @@ class PythonFramework:
         self.globals.updateDependencyStatus = False
 
     @SessionMethod
-    def runFlask(self,commandList) :
+    def runFlask(self,commandList):
         from PythonFrameworkFlask import app
         webbrowser.open_new('http://127.0.0.1:5000/')
         flaskReturn = app.run()

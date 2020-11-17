@@ -1,4 +1,4 @@
-import SqlAlchemyHelper
+import SqlAlchemyProxy
 from python_selenium_helper import SeleniumHelper
 
 FILE_FOLDER_LOCAL_PATH = 'repository\\file\\'
@@ -68,7 +68,7 @@ class WebScrapHelper(SeleniumHelper.SeleniumHelper):
 
         if not self.databaseName :
             self.databaseName = self.name
-        self.repository = SqlAlchemyHelper.SqlAlchemyHelper(
+        self.repository = SqlAlchemyProxy.SqlAlchemyProxy(
             name = self.databaseName,
             dialect = self.repositoryDialect,
             user = self.repositoryUser,

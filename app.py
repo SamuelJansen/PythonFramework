@@ -12,5 +12,4 @@ app = PythonFrameworkFlask.app
 api = PythonFrameworkFlask.api
 
 if __name__ == '__main__' :
-    print(f'[app] run()')
     app.run(debug=True)

@@ -1,7 +1,7 @@
-from SqlAlchemyHelper import *
+from SqlAlchemyProxy import *
 
 Model = getNewModel()
 
 API = 'Api'
 SESSION = 'Session'
-apiToSessionAssociation = getManyToMany(API, SESSION, Model)
+apiList, sessionList, manySisterToManyBrother = getManyToMany(API, SESSION, Model)

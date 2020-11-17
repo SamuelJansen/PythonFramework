@@ -1,4 +1,4 @@
-from SqlAlchemyHelper import *
+from SqlAlchemyProxy import *
 from python_helper import Constant
 import FrameworkModel
 
@@ -15,7 +15,8 @@ class Api(FrameworkModel.Model):
     gitUrl = Column(String(256),unique=True)
 
     importScript = Column(String(1024),unique=True)
-    sessionList = relationship(SESSION, secondary=FrameworkModel.apiToSessionAssociation, back_populates=f'{attributeIt(__tablename__)}{LIST}')
+    sessionList = FrameworkModel.sessionList ###- relationship(SESSION, secondary=FrameworkModel.apiToSessionAssociation, back_populates=f'{attributeIt(__tablename__)}{LIST}')
+    # sessionList = getRightSideManyToMany(API, SESSION, FrameworkModel.Model)
 
     def __init__(self,key,projectName,className,gitUrl,importScript,sessionList):
         self.key = key
