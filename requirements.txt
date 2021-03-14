@@ -1,4 +1,4 @@
-python_framework==0.1.8post12
+python-framework==0.1.8.post35
 requests
 python_selenium_helper
 swagger_integration_tests
