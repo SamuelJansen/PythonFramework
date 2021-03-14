@@ -1,5 +1,5 @@
 import subprocess
-from python_helper import Constant
+from python_helper import Constant as c
 import GitCommitterNewRelease
 
 import WakeUpVoiceAssistant, VoiceAssistant, GitCommand
@@ -53,7 +53,7 @@ class GitCommitter:
     ADD_COMMIT_PUSH_PROJECT = f'{GitCommand.KW_ADD}-{GitCommand.KW_COMMIT}-{GitCommand.KW_PUSH}-{KW_PROJECT}'
 
     COMMAND_NEW_DIST = 'python setup.py sdist'
-    COMMAND_TWINE_UPLOAD = f'twine upload -u {TOKEN_PY_PI_USERNAME} -p {TOKEN_PY_PI_PASSWORD} dist/*'
+    COMMAND_TWINE_UPLOAD = f'twine upload -u {TOKEN_PY_PI_USERNAME} -p {TOKEN_PY_PI_PASSWORD} dist/* --verbose'
 
     NEW_RELEASE_ALL = f'{KW_NEW_RELEASE}-{KW_ALL}'
     NEW_RELEASE_PROJECT = f'{KW_NEW_RELEASE}-{KW_PROJECT}'
@@ -70,7 +70,7 @@ class GitCommitter:
         print(f'GitCommitter.commandList = {commandList}')
         globals = self.globals
         if len(commandList) < GitCommitter.COMMAND_INDEX :
-            print(f'{globals.ERROR}{GitCommitter.MISSING_SPACE}{GitCommand.API_KEY_GIT_COMMITTER} command')
+            print(f'{c.ERROR}{GitCommitter.MISSING_SPACE}{GitCommand.API_KEY_GIT_COMMITTER} command')
             return
         gitCommiterCallCommand = commandList[GitCommitter.GIT_COMMITTER_INDEX]
         command = commandList[GitCommitter.COMMAND_INDEX]
@@ -78,7 +78,7 @@ class GitCommitter:
             try :
                 return self.commandSet[command](commandList)
             except Exception as exception :
-                print(f'''{globals.ERROR}Error processing command "{gitCommiterCallCommand} {command}": {str(exception)}''')
+                print(f'''{c.ERROR}Error processing command "{gitCommiterCallCommand} {command}": {str(exception)}''')
 
     def __init__(self,session,globals):
         self.globals = globals
@@ -132,7 +132,7 @@ class GitCommitter:
                     # print(self.getProcessReturnValue(returnSet[projectName][command]))
                     # globals.debug(returnSet[projectName][command])
             except Exception as exception :
-                print(f'{self.globals.ERROR}{projectName}{globals.SPACE_DASH_SPACE}{command}{globals.NEW_LINE}{str(exception)}')
+                print(f'{c.ERROR}{projectName}{c.SPACE_DASH_SPACE}{command}{c.NEW_LINE}{str(exception)}')
         return returnSet
 
     def runCommandSet(self,commandSet,path=None):
@@ -150,7 +150,7 @@ class GitCommitter:
                     returnSet[projectName][command] = subprocess.run(command,shell=True,capture_output=True,cwd=processPath)
                     # print(self.getProcessReturnValue(returnSet[projectName][command]))
             except Exception as exception :
-                print(f'{self.globals.ERROR}{projectName}{globals.SPACE_DASH_SPACE}{command}{globals.NEW_LINE}{str(exception)}')
+                print(f'{c.ERROR}{projectName}{c.SPACE_DASH_SPACE}{command}{c.NEW_LINE}{str(exception)}')
         return returnSet
 
     def setGlobalCredentials(self,commandList):
@@ -170,19 +170,21 @@ class GitCommitter:
     def deployHerokuProject(self,commandList):
         projectName = self.getArg(GitCommitter._1_ARGUMENT_INDEX,'Project name',commandList)
         commitMessage = self.getArg(GitCommitter._2_ARGUMENT_INDEX,f'{projectName} commit message',commandList)
+        api = self.getApi(projectName)
         if projectName :
             commandCommit = GitCommand.COMMIT.replace(GitCommand.TOKEN_COMMIT_MESSAGE,commitMessage)
-            commandCheckoutMaster = GitCommand.CHECKOUT.replace(GitCommand.TOKEN_BRANCH_NAME,GitCommand.KW_MASTER_BRANCH)
+            commandCheckoutMainBranch = GitCommand.CHECKOUT.replace(GitCommand.TOKEN_BRANCH_NAME,api.mainBranch)
             commandMergeOriginDevelop = GitCommand.MERGE_ORIGIN.replace(GitCommand.TOKEN_BRANCH_NAME,GitCommand.KW_DEVELOP_BRANCH)
+            pushHerokuCommand = GitCommand.PUSH_HEROKU_MASTER.replace(GitCommand.TOKEN_BRANCH_NAME, api.mainBranch)
             returnSet = self.runCommandSet({projectName:[
                 GitCommand.ADD,
                 commandCommit,
                 GitCommand.PUSH,
                 GitCommand.PUSH,
-                commandCheckoutMaster,
+                commandCheckoutMainBranch,
                 commandMergeOriginDevelop,
                 GitCommand.PUSH,
-                GitCommand.PUSH_HEROKU_MASTER
+                pushHerokuCommand
             ]})
             return self.debugReturnSet('deployHerokuProject',self.getReturnSetValue(returnSet))
 
@@ -261,11 +263,11 @@ class GitCommitter:
                 returnCorrectionSet[projectName] = {}
                 if specificReturnSet and specificReturnSet.items() :
                     for key,value in specificReturnSet.items() :
-                        for line in self.getProcessReturnErrorValue(value).split(self.globals.NEW_LINE) :
+                        for line in self.getProcessReturnErrorValue(value).split(c.NEW_LINE) :
                             if GitCommand.PUSH_SET_UPSTREAM_ORIGIN in line :
                                 commandPush = GitCommand.BRANCH
                                 returnCorrectionSet[projectName][commandPush] = self.runCommandSet({projectName:[commandPush]})[projectName][commandPush]
-                                dirtyBranchNameList = self.getProcessReturnValue(returnCorrectionSet[projectName][commandPush]).split(self.globals.NEW_LINE)
+                                dirtyBranchNameList = self.getProcessReturnValue(returnCorrectionSet[projectName][commandPush]).split(c.NEW_LINE)
                                 if dirtyBranchNameList :
                                     for dirtyBranchName in dirtyBranchNameList :
                                         if '*' in dirtyBranchName :
@@ -339,7 +341,7 @@ class GitCommitter:
         if variableKey and variableValue :
             globals = self.globals
             if variableKey == GitCommand.KW_SELF :
-                variableValue = f'{globals.localPath}{globals.apisRoot}{GitCommitter.__name__}{globals.BACK_SLASH}{globals.baseApiPath}'
+                variableValue = f'{globals.localPath}{globals.apisRoot}{GitCommitter.__name__}{c.BACK_SLASH}{globals.baseApiPath}'
                 print(variableValue)
             os.environ[variableKey] = variableValue
 
@@ -355,24 +357,24 @@ class GitCommitter:
 
     def getReturnSetValue(self,returnSet):
         globals = self.globals
-        returnValue = globals.NOTHING
+        returnValue = c.NOTHING
         if returnSet and returnSet.items():
             for projectName,specificReturnSet in returnSet.items() :
                 if specificReturnSet and specificReturnSet.items() :
                     for key,value in specificReturnSet.items() :
                         processReturnValue = self.getProcessReturnValue(value)
-                        if processReturnValue and not globals.NOTHING == processReturnValue :
-                            returnValue += f'{projectName}{globals.SPACE_DASH_SPACE}{key}{globals.NEW_LINE}{processReturnValue}'
+                        if processReturnValue and not c.NOTHING == processReturnValue :
+                            returnValue += f'{projectName}{c.SPACE_DASH_SPACE}{key}{c.NEW_LINE}{processReturnValue}'
                         else :
-                            returnValue += f'{projectName}{globals.SPACE_DASH_SPACE}{key}{globals.NEW_LINE}{self.getProcessReturnErrorValue(value)}'
-                    returnValue += globals.NEW_LINE
+                            returnValue += f'{projectName}{c.SPACE_DASH_SPACE}{key}{c.NEW_LINE}{self.getProcessReturnErrorValue(value)}'
+                    returnValue += c.NEW_LINE
         return returnValue
 
     def printReturn(self,processReturn):
         print(self.getReturnValue(processReturn))
 
     def debugReturnSet(self,callMethodName,ReturnSetValue):
-        self.globals.debug(f'{callMethodName}{2 * self.globals.NEW_LINE}{ReturnSetValue}')
+        self.globals.debug(f'{callMethodName}{2 * c.NEW_LINE}{ReturnSetValue}')
 
     def getArg(self,argIndex,typingGetMessage,commandList) :
         try :
@@ -390,7 +392,7 @@ class GitCommitter:
             return input
 
     def getImput(self,typingGetMessage):
-        return input(f'{typingGetMessage}{Constant.COLON_SPACE}')
+        return input(f'{typingGetMessage}{c.COLON_SPACE}')
 
     def getProjectNameList(self):
         if self.session :
@@ -400,3 +402,11 @@ class GitCommitter:
             return projectNameList
         else :
             return self.globals.apiNameList
+
+    def getApi(self,projectName) :
+        for api in self.session.apiList :
+            if projectName == api.projectName :
+                return api
+        errorMessage = f'{projectName} not found'
+        self.globals.error(errorMessage,Constant.NOTHING)
+        raise Exception(errorMessage)

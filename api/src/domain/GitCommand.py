@@ -23,7 +23,7 @@ class GitCommand:
     KW_NAME = 'name'
     KW_EMAIL = 'email'
 
-    KW_MASTER_BRANCH = 'master'
+    KW_MASTER_BRANCH = 'master' ###- deprecated. Use api.mainBranch insted
     KW_DEVELOP_BRANCH = 'develop'
 
 
@@ -61,4 +61,4 @@ class GitCommand:
 
     NEW_RELEASE = f'{TOKEN_PROJECT_URL}/releases/new?tag=v{TOKEN_RELEASE_VERSION}&target={TOKEN_TARGET}&title={TOKEN_TITLE}&body={TOKEN_DESCRIPTION}'
 
-    PUSH_HEROKU_MASTER = f'{KW_GIT} {KW_PUSH} heroku master'
+    PUSH_HEROKU_MASTER = f'{KW_GIT} {KW_PUSH} heroku {TOKEN_BRANCH_NAME}'

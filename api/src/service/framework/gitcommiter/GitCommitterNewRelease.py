@@ -13,7 +13,7 @@ def newReleaseAll(self,commandList) :
                 commitMessageArgumentIndex = self._2_ARGUMENT_INDEX
                 updateCommandSet(self,projectName,versionArgumentIndex,commitMessageArgumentIndex,commandSet,commandList)
             else :
-                self.globals.error(self.__class__,'Project name cannot be null', Constant.NOTHING)
+                self.globals.error('Project name cannot be null', Constant.NOTHING)
                 return
         return runNewRelease(self,commandSet)
     except Exception as exception :
@@ -28,7 +28,7 @@ def newReleaseProject(self,commandList) :
             commitMessageArgumentIndex = self._3_ARGUMENT_INDEX
             updateCommandSet(self,projectName,versionArgumentIndex,commitMessageArgumentIndex,commandSet,commandList)
         else :
-            self.globals.error(self.__class__,'Project name cannot be null', Constant.NOTHING)
+            self.globals.error('Project name cannot be null', Constant.NOTHING)
             return
         return runNewRelease(self,commandSet)
     except Exception as exception :
@@ -47,7 +47,7 @@ def getApi(self,projectName) :
         if projectName == api.projectName :
             return api
     errorMessage = f'{projectName} not found'
-    self.globals.error(self.__class__,errorMessage,Constant.NOTHING)
+    self.globals.error(errorMessage,Constant.NOTHING)
     raise Exception(errorMessage)
 
 def getUrl(self,api) :
@@ -65,13 +65,13 @@ def getDescription(self,api) :
         return description
     return Constant.NOTHING
 
-def getNewReleaseUrl(self,api,version):
+def getNewReleaseUrl(self,api,version,releaseMessage=None):
     url = GitCommand.NEW_RELEASE
     url = url.replace(GitCommand.TOKEN_PROJECT_URL,getUrl(self,api))
     url = url.replace(GitCommand.TOKEN_RELEASE_VERSION,version)
-    url = url.replace(GitCommand.TOKEN_TARGET,GitCommand.KW_MASTER_BRANCH)
+    url = url.replace(GitCommand.TOKEN_TARGET,api.mainBranch)
     url = url.replace(GitCommand.TOKEN_TITLE,api.projectName)
-    url = url.replace(GitCommand.TOKEN_DESCRIPTION,getDescription(self,api))
+    url = url.replace(GitCommand.TOKEN_DESCRIPTION,releaseMessage if releaseMessage else getDescription(self,api))
     return url
 
 def updateCommandSet(self,projectName,versionArgumentIndex,commitMessageArgumentIndex,commandSet,commandList) :
@@ -79,9 +79,11 @@ def updateCommandSet(self,projectName,versionArgumentIndex,commitMessageArgument
     version = self.getArg(versionArgumentIndex,f'{api.projectName} release version',commandList)
     validateVersion(self,version)
     commitMessage = self.getArg(commitMessageArgumentIndex,f'{api.projectName} commit message',commandList)
-    webbrowser.open_new(getNewReleaseUrl(self,api,version))
+    commitMessageSplited = commitMessage.split(Constant.COLON)
+    releaseMessage = commitMessageSplited[0] if 1 == len(commitMessageSplited) or commitMessageSplited[1] is None else Constant.COLON.join(commitMessageSplited[1:])
+    webbrowser.open_new(getNewReleaseUrl(self,api,version,releaseMessage=releaseMessage))
     commandCommit = GitCommand.COMMIT.replace(GitCommand.TOKEN_COMMIT_MESSAGE,commitMessage)
-    commandCheckoutMaster = GitCommand.CHECKOUT.replace(GitCommand.TOKEN_BRANCH_NAME,GitCommand.KW_MASTER_BRANCH)
+    commandCheckoutMainBranch = GitCommand.CHECKOUT.replace(GitCommand.TOKEN_BRANCH_NAME,api.mainBranch)
     commandMergeOriginDevelop = GitCommand.MERGE_ORIGIN.replace(GitCommand.TOKEN_BRANCH_NAME,GitCommand.KW_DEVELOP_BRANCH)
     commandNewDist = self.COMMAND_NEW_DIST
     commandTwineUpload = self.COMMAND_TWINE_UPLOAD.replace(self.TOKEN_PY_PI_USERNAME,self.PyPIUsername)
@@ -90,7 +92,7 @@ def updateCommandSet(self,projectName,versionArgumentIndex,commitMessageArgument
         GitCommand.ADD,
         commandCommit,
         GitCommand.PUSH,
-        commandCheckoutMaster,
+        commandCheckoutMainBranch,
         commandMergeOriginDevelop,
         GitCommand.PUSH,
         commandNewDist,

@@ -1,5 +1,6 @@
 import webbrowser
-from python_helper import log, Constant
+from python_helper import Constant as c
+from python_helper import log
 from FrameworkModel import Model
 import SqlAlchemyProxy, GitCommitter
 import Api, Session
@@ -87,7 +88,7 @@ class PythonFramework:
                     log.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
                     return api.handleCommandList(commandList)
                 else :
-                    log.failure(self.__class__,f'''couldn't instance api class of {commandList[self._0_API_KEY]}''', Constant.NOTHING)
+                    log.failure(self.__class__,f'''couldn't instance api class of {commandList[self._0_API_KEY]}''', c.NOTHING)
             else :
                 log.debug(self.__class__,f'{commandList[self._0_API_KEY]} key called and running all alone')
                 return externalFunction(commandList,globals,**self.kwargs)
@@ -120,7 +121,7 @@ class PythonFramework:
         self.kwargs = kwargs
         self.name = self.globals.getApiSetting('api.name')
         self.repository = SqlAlchemyProxy(model=Model,globals=self.globals)
-        self.importApplicationScriptPath = f'{self.globals.apiPath}{self.globals.baseApiPath}runtime{self.globals.BACK_SLASH}{IMPORT_SCRITP_FILE_NAME}.{self.globals.PYTHON_EXTENSION}'
+        self.importApplicationScriptPath = f'{self.globals.apiPath}{self.globals.baseApiPath}runtime{c.BACK_SLASH}{IMPORT_SCRITP_FILE_NAME}.{self.globals.PYTHON_EXTENSION}'
 
         self.apiSet = {}
         self.apiSet[self.API_KEY_FRAMEWORK] = {
@@ -199,23 +200,23 @@ class PythonFramework:
 
     @SessionMethod
     def sessionCommandList(self,commandList):
-        self.globals.printTree(self.apiSet,f'{Constant.TAB}Command list: ',depth=2)
+        self.globals.printTree(self.apiSet,f'{c.TAB}Command list: ',depth=2)
 
     @SessionMethod
     def printCommandList(self,commandList):
         self.globals.printTree(self.commandList,f'{self.__class__.__name__} commandList',depth=1)
 
     def printSuccess(self,message):
-        self.printMessage(message,Constant.SUCCESS)
+        self.printMessage(message,c.SUCCESS)
 
     def printError(self,message):
-        self.printMessage(message,Constant.ERROR)
+        self.printMessage(message,c.ERROR)
 
     def printWarning(self,message):
-        self.printMessage(message,Constant.WARNING)
+        self.printMessage(message,c.WARNING)
 
     def printMessage(self,message,level):
-        print(f'{Constant.TAB}{level}{message}')
+        print(f'{c.TAB}{level}{message}')
 
 
 def run(*args,**kwargs):

@@ -5,4 +5,4 @@ def printSession(self,commandList) :
         for api in self.session.apiList :
             print(f'{self.globals.TAB * 2}{api.key} : {api.className}')
     else :
-        self.globals.error(self.__class__, '''session is currently inactive''', self.globals.NOTHING)
+        self.globals.error( '''session is currently inactive''', self.globals.NOTHING)

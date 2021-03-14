@@ -1,4 +1,5 @@
 import os
+from python_helper import Constant as c
 import sqlalchemy
 from sqlalchemy import create_engine, exists, select
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
@@ -111,13 +112,6 @@ class SqlAlchemyProxy:
     DEFAULT_LOCAL_NAME = DEFAULT_LOCAL_STORAGE_NAME
 
     DEFAULT_DATABASE_TYPE = 'sqlite'
-    BAR = '''/'''
-    COLON = ''':'''
-    ARROBA = '''@'''
-    DOUBLE_BAR = 2 * BAR
-    TRIPLE_BAR = 3 * BAR
-
-    NOTHING = ''
 
     EXTENSION = 'db'
 
@@ -195,27 +189,27 @@ class SqlAlchemyProxy:
 
         if globals :
             globals.debug(f'Repository configuration:')
-            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}dialect = {self.dialect}')
-            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}user = wops!')
-            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}password = wops!')
-            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}host = {self.host}')
-            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}port = {self.port}')
-            globals.debug(f'{globals.TAB_UNITS * globals.SPACE}name = {self.name}')
+            globals.debug(f'{c.TAB_UNITS * c.SPACE}dialect = {self.dialect}')
+            globals.debug(f'{c.TAB_UNITS * c.SPACE}user = wops!')
+            globals.debug(f'{c.TAB_UNITS * c.SPACE}password = wops!')
+            globals.debug(f'{c.TAB_UNITS * c.SPACE}host = {self.host}')
+            globals.debug(f'{c.TAB_UNITS * c.SPACE}port = {self.port}')
+            globals.debug(f'{c.TAB_UNITS * c.SPACE}name = {self.name}')
 
-        user_password_host = self.NOTHING
+        user_password_host = c.NOTHING
         if self.user and self.password :
-            user_password_host += f'{self.user}{self.COLON}{self.password}'
+            user_password_host += f'{self.user}{c.COLON}{self.password}'
         if self.host :
-            user_password_host += f'{self.ARROBA}{self.host}{self.COLON}{self.port}'
-        user_password_host += self.BAR
+            user_password_host += f'{c.ARROBA}{self.host}{c.COLON}{self.port}'
+        user_password_host += c.SLASH
 
-        if user_password_host == self.BAR :
+        if user_password_host == c.SLASH :
             self.name = f'{self.name}.{self.EXTENSION}'
 
         if not self.dialect :
             self.dialect = self.DEFAULT_DATABASE_TYPE
 
-        self.databaseUrl = f'{self.dialect}:{self.DOUBLE_BAR}{user_password_host}{self.name}'
+        self.databaseUrl = f'{self.dialect}:{c.DOUBLE_SLASH}{user_password_host}{self.name}'
 
     @Method
     def run(self):

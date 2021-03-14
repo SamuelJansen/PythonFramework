@@ -34,11 +34,11 @@ def loadApiClass(self,api) :
         apiClass = Import.getApiClass()
         return apiClass
     except Exception as exception :
-        self.globals.error(self.__class__,f'Not possible to reach {api.key} due command line',exception)
+        self.globals.error(f'Not possible to reach {api.key} due command line',exception)
 
 def eraseImportApplicationScript(self) :
     try :
         with open(self.importApplicationScriptPath,self.globals.OVERRIDE,encoding = self.globals.ENCODING) as scriptFile :
             scriptFile.write('')
     except Exception as exception :
-        self.globals.error(self.__class__,f'Not possible to erase import application script',exception)
+        self.globals.error(f'Not possible to erase import application script',exception)

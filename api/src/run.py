@@ -1,22 +1,26 @@
-from globals import Globals
-globals = Globals(__file__,
-    debugStatus = True,
-    warningStatus = True,
-    errorStatus = True,
+import globals
+globalsInstance = globals.newGlobalsInstance(__file__,
+    loadLocalConfig = False,
+    settingStatus = True,
     successStatus = True,
-    failureStatus = True,
-    settingStatus = True
+    errorStatus = True,
+    debugStatus = True,
+    warningStatus = True
+    # wrapperStatus = True,
+    # failureStatus = True,
+    # logStatus = True,
+    # testStatus = True,
 )
 
 def pythonFrameworkDefaultRunMethod(commandList,globals,**kwargs):
-    globals.debug(f'"pythonFrameworkDefaultRunMethod()" method not implemented')
+    globalsInstance.debug(f'"pythonFrameworkDefaultRunMethod()" method not implemented')
 
 if __name__ == '__main__' :
-    globals.giveLocalVisibilityToFrameworkApis([
+    globalsInstance.giveLocalVisibilityToFrameworkApis([
         'globals',
         'python_helper',
         'python_selenium_helper',
         'swagger_integration_tests'
     ])
     import PythonFramework
-    PythonFramework.run(pythonFrameworkDefaultRunMethod,globals)
+    PythonFramework.run(pythonFrameworkDefaultRunMethod,globalsInstance)
