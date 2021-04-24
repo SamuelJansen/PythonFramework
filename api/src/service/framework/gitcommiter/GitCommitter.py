@@ -407,6 +407,6 @@ class GitCommitter:
         for api in self.session.apiList :
             if projectName == api.projectName :
                 return api
-        errorMessage = f'{projectName} not found'
+        errorMessage = f'project "{projectName}" not found'
         self.globals.error(errorMessage,Constant.NOTHING)
         raise Exception(errorMessage)
