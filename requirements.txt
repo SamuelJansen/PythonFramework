@@ -1,4 +1,7 @@
 python-framework==0.1.8.post35
-requests
-python_selenium_helper
-swagger_integration_tests
+requests==2.24.0
+python-Levenshtein==0.12.2
+SpeechRecognition==3.8.1
+pyttsx3==2.90
+#python_selenium_helper
+#swagger_integration_tests
