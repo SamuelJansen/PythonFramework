@@ -353,7 +353,12 @@ class GitCommitter:
         return str(processReturn.stdout,self.globals.ENCODING)
 
     def getProcessReturnErrorValue(self,processReturn):
-        return str(processReturn.stderr,self.globals.ENCODING)
+        errorMessage = str(processReturn.stderr)
+        try:
+            errorMessage = str(processReturn.stderr, self.globals.ENCODING)
+        except Exception as exception:
+            log.failure(self.getProcessReturnErrorValue, 'Not possible to parse error message', exception)
+        return errorMessage
 
     def getReturnSetValue(self,returnSet):
         globals = self.globals

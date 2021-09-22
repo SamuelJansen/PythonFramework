@@ -1,6 +1,5 @@
-import os, sys, re, speech_recognition, Levenshtein, pyttsx3
-
-import GitCommitter
+from python_helper import ObjectHelper, log
+import os, sys, re, speech_recognition, pyttsx3
 
 class VoiceAssistant:
 
@@ -16,9 +15,9 @@ class VoiceAssistant:
     def handleCommandList(self,commandList):
         return self.run()
 
-    def __init__(self,globals) :
+    def __init__(self, globals=None) :
         self.globals = globals
-        self.language = self.globals.getApiSetting(VoiceAssistant.API_KEY_LANGUAGE)
+        self.language = 'EN-US' if ObjectHelper.isNone(globals) else self.globals.getApiSetting(VoiceAssistant.API_KEY_LANGUAGE)
         self.brain = speech_recognition
         self.sound = self.brain.Microphone
         self.listenner = self.brain.Recognizer()
@@ -26,14 +25,13 @@ class VoiceAssistant:
         speakerList = self.speaker.getProperty(VoiceAssistant.KW_PYTTSX3_VOICE_LIST)
         for speaker in speakerList:
             if self.language in speaker.id :
-                self.globals.debug(f'speaker = {speaker}')
+                log.debug(self.__init__, f'speaker = {speaker}')
                 self.speaker.setProperty(VoiceAssistant.KW_PYTTSX3_VOICE,speaker.id)
         self.language
         self.running = False
 
     def run(self):
         self.awake = True
-        globals = self.globals
         while self.awake :
             content = self.listen()
             if content not in VoiceAssistant.SLEEP :
@@ -42,23 +40,23 @@ class VoiceAssistant:
                 self.awake = False
 
     def listen(self):
-        debug = self.globals.debug
         interpreted = False
         while not interpreted :
+            audioContent = None
             with self.sound() as soundArround :
                 print('Voice assistant ready')
                 self.listenner.adjust_for_ambient_noise(soundArround)
                 print('Voice assistant listenning')
                 audioContent = self.listenner.listen(soundArround)
-                content = VoiceAssistant.NO_CONTENT
-                try :
-                    print('Voice assistant interpretting')
-                    content = self.listenner.recognize_google(audioContent,language=self.language)
-                    if not content == VoiceAssistant.NO_CONTENT:
-                        interpreted = True
-                except Exception as exception :
-                    debug(f'{VoiceAssistant.EXCEPTION} {str(exception)}')
-        debug(f'content = {content}')
+            content = VoiceAssistant.NO_CONTENT
+            try :
+                print('Voice assistant interpretting')
+                content = self.listenner.recognize_google(audioContent,language=self.language)
+                if not content == VoiceAssistant.NO_CONTENT:
+                    interpreted = True
+            except Exception as exception :
+                log.debug(self.listen, f'{VoiceAssistant.EXCEPTION} {str(exception)}')
+        log.debug(self.listen, f'content = {content}')
         return content
 
     def speak(self,content) :
@@ -66,8 +64,12 @@ class VoiceAssistant:
             self.speaker.say(content)
             self.speaker.runAndWait()
         except Exception as exception :
-            self.globals.debug(f'Speaker failed: {str(exception)}')
+            log.debug(self.speak, f'Speaker failed: {str(exception)}')
             import win32com.client as wincl
             speaker = wincl.Dispatch("SAPI.SpVoice")
             speaker = pyttsx3.init()
             speaker.Speak(content)
+
+if __name__ == '__main__' :
+    va = VoiceAssistant()
+    va.run()

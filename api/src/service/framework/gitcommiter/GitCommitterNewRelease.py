@@ -1,5 +1,5 @@
 import webbrowser
-from python_helper import Constant
+from python_helper import Constant, log
 import GitCommand
 
 GitCommand = GitCommand.GitCommand
@@ -17,7 +17,7 @@ def newReleaseAll(self,commandList) :
                 return
         return runNewRelease(self,commandSet)
     except Exception as exception :
-        print(exception)
+        log.error(newReleaseAll, 'Not possible to process all releases', exception)
 
 def newReleaseProject(self,commandList) :
     try :
@@ -32,7 +32,7 @@ def newReleaseProject(self,commandList) :
             return
         return runNewRelease(self,commandSet)
     except Exception as exception :
-        print(exception)
+        log.error(newReleaseProject, 'Not possible to process new project release', exception)
 
 def runNewRelease(self,commandSet) :
     try :
@@ -40,7 +40,7 @@ def runNewRelease(self,commandSet) :
         self.debugReturnSet('newReleaseAll',self.getReturnSetValue(returnSet))
         return returnSet
     except Exception as exception :
-        print(exception)
+        log.error(runNewRelease, 'Not possible to run new release', exception)
 
 def getApi(self,projectName) :
     for api in self.session.apiList :
