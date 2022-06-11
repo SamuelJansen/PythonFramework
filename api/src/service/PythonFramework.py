@@ -70,7 +70,6 @@ class PythonFramework:
         globals = self.globals
         log.debug(self.__class__,f'{self.__class__.__name__}.commandList = {commandList}')
         log.debug(self.__class__,f'session = {self.session}')
-        print(self.apiSet)
         commandListReturn = self.apiSet[commandList[self._0_API_KEY]][commandList[self._1_COMMAND]](commandList)
         self.repository.close()
         return commandListReturn
