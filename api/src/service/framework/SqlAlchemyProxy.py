@@ -4,6 +4,7 @@ import sqlalchemy
 from sqlalchemy import create_engine, exists, select
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship
 from sqlalchemy.orm.collections import InstrumentedList
+from sqlalchemy.orm import close_all_sessions
 from sqlalchemy.ext.declarative import declarative_base, DeclarativeMeta
 from sqlalchemy import Table, Column, Integer, String, Float, ForeignKey, UnicodeText, MetaData, Sequence, DateTime
 
@@ -45,6 +46,7 @@ KW_NAME = 'name'
 KW_MAIN_URL = 'main-url'
 
 KW_REPOSITORY = 'repository'
+KW_REPOSITORY_URL = 'url'
 KW_REPOSITORY_DIALECT = 'dialect'
 KW_REPOSITORY_USER = 'user'
 KW_REPOSITORY_PASSWORD = 'password'
@@ -149,37 +151,47 @@ class SqlAlchemyProxy:
         self.session = scoped_session(sessionmaker(self.engine)) ###- sessionmaker(bind=self.engine)()
         self.model = model
         self.model.metadata.bind = self.engine
+        self.model.metadata.reflect()
 
         self.run()
 
     def globalsConfiguration(self,localName,dialect,user,password,host,port,model,globals,echo,checkSameThread):
+        databaseUrl = globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_URL}')
+        if databaseUrl:
+            self.databaseUrl = databaseUrl
+            dialect = databaseUrl.split('://')[0]
+            user = databaseUrl.split('://')[1].split('@')[0].split(':')[0]
+            password = databaseUrl.split('://')[1].split('@')[0].split(':')[1]
+            host = databaseUrl.split('://')[1].split('@')[1].split(':')[0]
+            port = databaseUrl.split('://')[1].split('@')[1].split(':')[1].split('/')[0]
+            databaseName = databaseUrl.split('://')[1].split('@')[1].split(':')[1].split('/')[1]
         if not dialect and globals :
             self.dialect = globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_DIALECT}')
         else :
             self.dialect = dialect
 
-        if not dialect and globals :
+        if not user and globals :
             self.user = globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_USER}')
         else :
             self.user = user
 
-        if not dialect and globals :
+        if not password and globals :
             self.password = globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_PASSWORD}')
         else :
             self.password = password
 
-        if not dialect and globals :
+        if not host and globals :
             self.host = globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_HOST}')
         else :
             self.host = host
 
-        if not dialect and globals :
+        if not port and globals :
             self.port = globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_PORT}')
         else :
             self.port = port
 
         if localName == self.TOKEN_WITHOUT_NAME and globals :
-            databaseName = globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_DATABASE}')
+            databaseName = databaseName if databaseName else globals.getApiSetting(f'{KW_API}.{KW_REPOSITORY}.{KW_REPOSITORY_DATABASE}')
             if databaseName and not 'None' == databaseName :
                 self.name = databaseName
             else :
@@ -214,6 +226,20 @@ class SqlAlchemyProxy:
     @Method
     def run(self):
         self.model.metadata.create_all(self.engine)
+
+    def close(self):
+        try:
+            close_all_sessions()
+            self.engine.dispose() # NOTE: close required before dispose!
+        except Exception as firstException:
+            log.warning(self.close, 'not possible to close connections. Going for a second attempt', exception=firstException)
+            try:
+                close_all_sessions()
+                self.engine.dispose() # NOTE: close required before dispose!
+            except Exception as secondException:
+                log.error(self.close, 'not possible to close connections at the second attempt either', secondException)
+                raise secondException
+        log.debug(self.close, 'Connections closed')
 
     @Method
     def commit(self):

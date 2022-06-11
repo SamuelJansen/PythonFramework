@@ -25,6 +25,6 @@ def getDefaultApiList(self) :
         apiClassName = self.globals.getApiSetting('api.basic.api.class-name')
         gitUrl = self.globals.getApiSetting('api.git.url')
         gitExtension = self.globals.getApiSetting('api.git.extension')
-        importScript = ADD_APPLICATION_FILE_SCRIPT.replace(APPLICATION_TOKEN,apiClassName)
+        importScript = ADD_APPLICATION_FILE_SCRIPT.replace(APPLICATION_TOKEN,apiClassName.replace('-', '_'))
         sessionList = []
         return [Api(apiKey,projectName,apiClassName,f'''{gitUrl}/{apiClassName}.{gitExtension}''',importScript,sessionList)]

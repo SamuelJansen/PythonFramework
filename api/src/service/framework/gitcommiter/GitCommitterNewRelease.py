@@ -4,7 +4,7 @@ import GitCommand
 
 GitCommand = GitCommand.GitCommand
 
-def newReleaseAll(self,commandList) :
+def newReleaseAll(self,commandList):
     try :
         commandSet = {}
         for projectName in self.projectNameList :
@@ -19,7 +19,8 @@ def newReleaseAll(self,commandList) :
     except Exception as exception :
         log.error(newReleaseAll, 'Not possible to process all releases', exception)
 
-def newReleaseProject(self,commandList) :
+def newReleaseProject(self,commandList):
+    log.prettyPython(newReleaseProject, 'commandList', commandList, logLevel=log.INFO)
     try :
         commandSet = {}
         projectName = self.getArg(self._1_ARGUMENT_INDEX,'Project name',commandList)
@@ -34,7 +35,8 @@ def newReleaseProject(self,commandList) :
     except Exception as exception :
         log.error(newReleaseProject, 'Not possible to process new project release', exception)
 
-def runNewRelease(self,commandSet) :
+def runNewRelease(self,commandSet):
+    log.prettyPython(runNewRelease, 'commandSet', commandSet, logLevel=log.INFO)
     try :
         returnSet = self.runCommandSet(commandSet)
         self.debugReturnSet('newReleaseAll',self.getReturnSetValue(returnSet))
@@ -42,24 +44,27 @@ def runNewRelease(self,commandSet) :
     except Exception as exception :
         log.error(runNewRelease, 'Not possible to run new release', exception)
 
-def getApi(self,projectName) :
+def getApi(self,projectName):
     for api in self.session.apiList :
         if projectName == api.projectName :
+            return api
+    for api in self.session.apiList :
+        if projectName == api.key :
             return api
     errorMessage = f'project "{projectName}" not found'
     self.globals.error(errorMessage,Constant.NOTHING)
     raise Exception(errorMessage)
 
-def getUrl(self,api) :
+def getUrl(self,api):
     return api.gitUrl.replace(f'{Constant.DOT}{self.gitExtension}',Constant.NOTHING)
 
-def validateVersion(self,version) :
+def validateVersion(self,version):
     if not version or Constant.NOTHING == version :
         raise Exception('''Version cannot be null''')
     if 'v' in version or 'v-' in version or 'V' in version or 'V-' in version :
-        raise Exception('''Version cannot contain "v" or "V" of "v-" or "V-" charactere''')
+        raise Exception('''Version cannot contain "v" or "V" of "v-" or "V-" character''')
 
-def getDescription(self,api) :
+def getDescription(self,api):
     description = '+'.join(self.getImput(f'{api.projectName} description').split())
     if description :
         return description
@@ -74,7 +79,7 @@ def getNewReleaseUrl(self,api,version,releaseMessage=None):
     url = url.replace(GitCommand.TOKEN_DESCRIPTION,releaseMessage if releaseMessage else getDescription(self,api))
     return url
 
-def updateCommandSet(self,projectName,versionArgumentIndex,commitMessageArgumentIndex,commandSet,commandList) :
+def updateCommandSet(self,projectName,versionArgumentIndex,commitMessageArgumentIndex,commandSet,commandList):
     api = getApi(self,projectName)
     version = self.getArg(versionArgumentIndex,f'{api.projectName} release version',commandList)
     validateVersion(self,version)

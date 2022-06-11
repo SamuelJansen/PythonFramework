@@ -3,7 +3,7 @@ Globals:
     api:
         name: PythonFramework
         repository :
-            dialect: postgres
+            dialect: postgresql
             user: jbqafgvnjszmoh
             password: 9a4b08000c04c22cd6f533c5ac76098102aecdb646e9bc2fb3d9a74089fcebc9
             host: ec2-35-173-94-156.compute-1.amazonaws.com

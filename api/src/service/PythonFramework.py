@@ -1,4 +1,3 @@
-import webbrowser
 from python_helper import Constant as c
 from python_helper import log
 from FrameworkModel import Model
@@ -55,7 +54,7 @@ class PythonFramework:
         COMMAND_OPEN_SESSION : ['sessionKey'],
         COMMAND_ADD_TO_SESSION : ['sessionKey','apiKey','apiProjectName','apiClassName','gitUrl'],
         COMMAND_REMOVE_FROM_SESSION : [],
-        COMMAND_SAVE_SESSION : [],
+        COMMAND_SAVE_SESSION : ['sessionKey'],
         COMMAND_PRINT_SESSION : [],
         COMMAND_SESSION_COMMAND_LIST : [],
         COMMAND_CLOSE_SESSION : [],
@@ -71,7 +70,10 @@ class PythonFramework:
         globals = self.globals
         log.debug(self.__class__,f'{self.__class__.__name__}.commandList = {commandList}')
         log.debug(self.__class__,f'session = {self.session}')
-        return self.apiSet[commandList[self._0_API_KEY]][commandList[self._1_COMMAND]](commandList)
+        print(self.apiSet)
+        commandListReturn = self.apiSet[commandList[self._0_API_KEY]][commandList[self._1_COMMAND]](commandList)
+        self.repository.close()
+        return commandListReturn
 
     @SessionMethod
     def handleSystemArgumentValue(self,commandList,externalFunction):
@@ -91,11 +93,13 @@ class PythonFramework:
                     log.failure(self.__class__,f'''couldn't instance api class of {commandList[self._0_API_KEY]}''', c.NOTHING)
             else :
                 log.debug(self.__class__,f'{commandList[self._0_API_KEY]} key called and running all alone')
-                return externalFunction(commandList,globals,**self.kwargs)
+                externalFunctonReturn = externalFunction(commandList,globals,**self.kwargs)
+                self.repository.close()
+                return externalFunctonReturn
         except Exception as exception :
             errorMessage = str(exception)
             if self.MISSING_REQUIRED_ARGUMENT in errorMessage :
-                newArgs = *self.args,self.globals
+                newArgs = (*self.args,self.globals)
                 try :
                     api = apiClass(*newArgs,**self.kwargs)
                     log.success(self.__class__, f'running {apiClass.__name__}({self.args}, {self.kwargs})')
@@ -113,6 +117,7 @@ class PythonFramework:
                 secondErrorMessage = ''
                 thirdErrorMessage = ''
             globals.error(self.__class__, f'error processing "{commandList[self._0_API_KEY]}" call{secondErrorMessage}{thirdErrorMessage}', errorMessage)
+            self.repository.close()
 
     def __init__(self,*args,**kwargs):
         self.globals = args[-1]
@@ -159,7 +164,6 @@ class PythonFramework:
     @SessionMethod
     def runFlask(self,commandList):
         from PythonFrameworkFlask import app
-        webbrowser.open_new('http://127.0.0.1:5000/')
         flaskReturn = app.run()
         return flaskReturn
 

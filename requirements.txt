@@ -1,7 +1,6 @@
-python-framework==0.1.8.post35
+python-framework>=0.5.61
 requests==2.24.0
 python-Levenshtein==0.12.2
 SpeechRecognition==3.8.1
 pyttsx3==2.90
-#python_selenium_helper
-#swagger_integration_tests
+twine==3.4.2

@@ -67,7 +67,7 @@ class GitCommitter:
     CONFIRM = ['execute']
 
     def handleCommandList(self,commandList):
-        print(f'GitCommitter.commandList = {commandList}')
+        # print(f'GitCommitter.commandList = {commandList}')
         globals = self.globals
         if len(commandList) < GitCommitter.COMMAND_INDEX :
             print(f'{c.ERROR}{GitCommitter.MISSING_SPACE}{GitCommand.API_KEY_GIT_COMMITTER} command')
@@ -390,11 +390,11 @@ class GitCommitter:
             self.globals.debug(f'Not possible to get commandList[{argIndex}]. Cause: {str(exception)}')
             return self.validInput(self.getImput(typingGetMessage))
 
-    def validInput(self,input):
-        if input == GitCommitter.SKIP :
+    def validInput(self,givenInput):
+        if givenInput == GitCommitter.SKIP :
             return None
         else :
-            return input
+            return givenInput
 
     def getImput(self,typingGetMessage):
         return input(f'{typingGetMessage}{c.COLON_SPACE}')

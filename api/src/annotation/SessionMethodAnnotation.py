@@ -18,5 +18,5 @@ def SessionMethod(sessionMethod,*args,**kwargs) :
                     methodName = f' {methodName}'
             except :
                 methodName = ''
-            log.wraper(SessionMethod,f'''failed to execute{className}{methodName} method''',exception)
+            log.debug(SessionMethod,f'''failed to execute{className}{methodName} method''',exception)
     return wraperMethod
